@@ -17,6 +17,7 @@ data_dict = {
     'fasina_ebola_data' : fasina_ebola_data,
     'fay_ebola_data' : fay_ebola_data,
     'cdc_sars_data' : cdc_sars_data,
+    'cowling_sars_data' : cowling_sars_data,
     'mers_data' : mers_data,
     'noro_data' :noro_data
     }
