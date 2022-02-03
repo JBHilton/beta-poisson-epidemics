@@ -15,10 +15,12 @@ fasina_ebola_data = [0]*15+[1]*2+[2]+[3]+[12]
 
 fay_ebola_data = [1,2,2,5,14,1,4,4,1,3,3,8,2,1,1,4,9,9,1,1,17,2,1,1,1,4,3,3,4,2,
                 5,1,2,2,1,9,1,3,1,2,1,1,2]
+fay_ebola_data = fay_ebola_data + [0] * (152 - len(fay_ebola_data))
 
 cdc_sars_data = [0]*162+[1]*19+[2]*8+[3]*7+[7]+[12]+[21]+[23]+[40]
 
-cowling_sars_data = [38,3,2,1,6,81,2,23,2,1,1,1,5,1,1,1,2,1,1,1]
+cowling_mers_data = [38,3,2,1,6,81,2,23,2,1,1,1,5,1,1,1,2,1,1,1]
+cowling_mers_data = cowling_mers_data + [0] * (166 - len(cowling_mers_data))
 
 mers_data = [0]*13+[1]*5+[2]*4+[3]+[7]
 

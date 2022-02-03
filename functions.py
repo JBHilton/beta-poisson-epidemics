@@ -98,7 +98,7 @@ def get_theta_mle(data,theta_0):
     def f(theta):
         lmbd=np.mean(data)
         return -neg_bin_loglh_theta(data,lmbd,theta)
-    mle=sp.optimize.minimize(f,[theta_0],bounds=((1e-6,50),))
+    mle=sp.optimize.minimize(f,[theta_0],bounds=((1e-6, 5 * theta_0),))
     return mle.x[0]
 
 def beta_poisson_pmf(x,lmbd,Phi,N):
@@ -589,7 +589,7 @@ def get_lambda_and_phi_mles(data,lmbd_0,phi_0,N_emp):
 def generate_mle_dict(data,
                       theta_0,
                       phi_0,
-                      N_0,
+                      N_inv_0,
                       lmbd_0,
                       sigma_0):
     '''
@@ -617,9 +617,9 @@ def generate_mle_dict(data,
             dictionary containing maximum likelihood estimates of parameters for
             each model.
     '''
-    theta_mle=get_theta_mle(data,1.5)
-    phi_mle,N_inv_mle=get_phi_and_N_mles(data,0.5,1/2)
-    lmbd_mle,sigma_mle=get_zip_mles(data,1.5,0.5)
+    theta_mle=get_theta_mle(data, theta_0)
+    phi_mle,N_inv_mle=get_phi_and_N_mles(data, phi_0, N_inv_0)
+    lmbd_mle,sigma_mle=get_zip_mles(data, lmbd_0, sigma_0)
 
     mle_dict = {
         'poisson' : np.mean(data),
@@ -652,23 +652,29 @@ def generate_llh_dict(data, mle_dict):
 
     plh = poisson_loglh(data, mle_dict['poisson'])
     glh = geo_loglh(data, mle_dict['geometric'])
-    nblh = neg_bin_loglh(data,
+    nblh = neg_bin_loglh_theta(data,
                          mle_dict['negative binomial'][0],
                          mle_dict['negative binomial'][1])
-    ziplh = neg_bin_loglh(data,
+    ziplh = zip_loglh(data,
                         mle_dict['zip'][0],
                         mle_dict['zip'][1] )
-    bplh = beta_poisson_loglh(data,
+
+    if mle_dict['beta-Poisson'][2] < 1e-4:
+        bplh = neg_bin_loglh(data,
+                             mle_dict['beta-Poisson'][0],
+                             mle_dict['beta-Poisson'][1])
+    else:
+        bplh = beta_poisson_loglh(data,
                          mle_dict['beta-Poisson'][0],
                          mle_dict['beta-Poisson'][1],
-                         mle_dict['beta-Poisson'][2])
+                         1 / mle_dict['beta-Poisson'][2])
 
     llh_dict = {
         'poisson' : [plh, 2 - 2 * plh],
         'geometric' : [glh, 2 - 2 * glh],
-        'negative binomial' : [nblh, 2 - 2 * nblh],
-        'zip' : [ziplh, 2 - 2 * ziplh],
-        'beta-Poisson' : [bplh, 2 - 2 * bplh]
+        'negative binomial' : [nblh, 4 - 2 * nblh],
+        'zip' : [ziplh, 4 - 2 * ziplh],
+        'beta-Poisson' : [bplh, 6 - 2 * bplh]
     }
 
     return llh_dict
@@ -862,8 +868,6 @@ def ci_from_bootstrap_samples(samples, mle, confidence_level):
 
     ci=[np.percentile(samples, alpha/2),
         np.percentile(samples, 100 - alpha/2)]
-
-    print('ci=',ci)
 
     return ci
 

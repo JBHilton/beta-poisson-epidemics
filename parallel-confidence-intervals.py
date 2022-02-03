@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from numpy import arange, array, percentile, size
+from numpy import arange, array, mean, percentile, size, var
 from os import mkdir
 from os.path import isdir, isfile
 from pickle import dump
@@ -8,8 +8,9 @@ from copy import deepcopy
 from multiprocessing import Pool
 from time import time as get_time
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_sars_data, mers_data, noro_data)
-from functions import ci_from_bootstrap_samples, generate_mle_dict
+    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from functions import (ci_from_bootstrap_samples, generate_llh_dict,
+    generate_mle_dict)
 
 data_dict = {
     'plague_data' : plague_data,
@@ -17,7 +18,7 @@ data_dict = {
     'fasina_ebola_data' : fasina_ebola_data,
     'fay_ebola_data' : fay_ebola_data,
     'cdc_sars_data' : cdc_sars_data,
-    'cowling_sars_data' : cowling_sars_data,
+    'cowling_mers_data' : cowling_mers_data,
     'mers_data' : mers_data,
     'noro_data' :noro_data
     }
@@ -29,13 +30,24 @@ if isdir('outputs/mles') is False:
 
 class MLECalculator:
     def __init__(self, data_set):
+
+        sample_mean = mean(data_set)
+        sample_var = var(data_set)
+
+        # Define some ansatzes of parameter MLEs
+        theta_0 = (sample_var / sample_mean) - 1
+        phi_0 = 1 / theta_0
+        N_0 = 10 * sample_mean
+        zip_lmbd_0 = sample_mean
+        sigma_0 = 0.5
+
         self.data_set = data_set
         self.mle_dict = generate_mle_dict(data_set,
-                              1.5,
-                              0.5,
-                              1/2,
-                              1.5,
-                              0.5)
+                            theta_0,
+                            phi_0,
+                            1 / N_0,
+                            zip_lmbd_0,
+                            sigma_0)
         self.sample_size = sample_size=size(data_set)
 
     def __call__(self, p):
@@ -50,13 +62,27 @@ class MLECalculator:
         return result
 
     def _resample_and_fit(self, p):
-        data_now=choices(self.data_set, k=self.sample_size)
+        sample_flag = 0
+        while sample_flag==0:
+            data_now=choices(self.data_set, k=self.sample_size)
+            sample_mean = mean(data_now)
+            if sample_mean > 0:
+                sample_flag = 1
+        sample_var = var(data_now)
+        if sample_var > sample_mean:
+            theta_0 = (sample_var / sample_mean) - 1
+        else:
+            theta_0 = 1e-1
+        phi_0 = 1 / theta_0
+        N_0 = 2 * sample_mean
+        zip_lmbd_0 = sample_mean
+        sigma_0 = 0.5
         sample_dict = generate_mle_dict(data_now,
-                              1.5,
-                              0.5,
-                              1/2,
-                              1.5,
-                              0.5)
+                              theta_0,
+                              phi_0,
+                              1 / N_0,
+                              zip_lmbd_0,
+                              sigma_0)
         return sample_dict
 
 def main(no_of_workers,
@@ -133,8 +159,7 @@ def main(no_of_workers,
                           beta_poi_N_inv_ci]
     }
 
-    print(calculator.mle_dict)
-    print(ci_dict)
+    llh_dict = generate_llh_dict(data_set, mle_dict)
 
 
     print('Bootstrap took',get_time()-main_start,'seconds.')
@@ -142,8 +167,9 @@ def main(no_of_workers,
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname, 'wb') as f:
         dump(
-            (calculator.mle_dict,
-            ci_dict),
+            (mle_dict,
+            ci_dict,
+            llh_dict),
             f)
 
     return -1
