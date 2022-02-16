@@ -631,6 +631,53 @@ def generate_mle_dict(data,
 
     return mle_dict
 
+def generate_var_dict(data, mle_dict):
+    '''
+    Calculates variances of fitted distributions based on MLEs.
+
+    Parameters
+    ----------
+        data : list
+            sample dataset
+        mle_dict : dictionary
+            dictionary containing maximum likelihood estimates of parameters for
+            each model, outputted by generate_mle_dict
+
+    Returns
+    -------
+        var_dict : dictionary
+            dictionary containing model variance for each maximum
+            likelihood fit
+    '''
+
+    sample_mean = np.mean(data)
+
+    p_var = sample_mean
+    g_var = sample_mean * (1 + sample_mean)
+    nb_var = sample_mean * (
+             1 + mle_dict['negative binomial'][1])
+    zip_var = mle_dict['zip'][0] * (
+              1 - mle_dict['zip'][1] ) * (
+              1 + mle_dict['zip'][0] * mle_dict['zip'][1] )
+
+    if mle_dict['beta-Poisson'][2] < 1e-4:
+        bp_var = nb_var
+    else:
+        bp_var = sample_mean * (
+            1 + (1 - sample_mean * mle_dict['beta-Poisson'][2]) / \
+            (mle_dict['beta-Poisson'][1] + mle_dict['beta-Poisson'][2]))
+
+    var_dict = {
+        'sample' : np.var(data),
+        'poisson' : p_var,
+        'geometric' : g_var,
+        'negative binomial' : nb_var,
+        'zip' : zip_var,
+        'beta-Poisson' : bp_var
+    }
+
+    return var_dict
+
 def generate_llh_dict(data, mle_dict):
     '''
     Calculates log likelihoods and AICs of fitted distributions.

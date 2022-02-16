@@ -10,7 +10,7 @@ from time import time as get_time
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
     fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
 from functions import (ci_from_bootstrap_samples, generate_llh_dict,
-    generate_mle_dict)
+    generate_mle_dict, generate_var_dict)
 
 data_dict = {
     'plague_data' : plague_data,
@@ -48,18 +48,20 @@ class MLECalculator:
                             1 / N_0,
                             zip_lmbd_0,
                             sigma_0)
-        self.sample_size = sample_size=size(data_set)
+        self.var_dict = generate_var_dict(data_set,
+                            self.mle_dict)
+        self.sample_size = size(data_set)
 
     def __call__(self, p):
         try:
-            result = self._resample_and_fit(p)
+            results = self._resample_and_fit(p)
         except ValueError as err:
             print(
                 'Exception raised for parameters={0}\n\tException: {1}'.format(
                 p, err)
                 )
             return 0.0
-        return result
+        return results
 
     def _resample_and_fit(self, p):
         sample_flag = 0
@@ -83,7 +85,8 @@ class MLECalculator:
                               1 / N_0,
                               zip_lmbd_0,
                               sigma_0)
-        return sample_dict
+        sample_vars = generate_var_dict(data_now, sample_dict)
+        return [sample_dict, sample_vars]
 
 def main(no_of_workers,
          no_samples,
@@ -97,9 +100,12 @@ def main(no_of_workers,
     params = arange(no_samples)
 
     with Pool(no_of_workers) as pool:
-        dict_samples = pool.map(calculator, params)
+        results = pool.map(calculator, params)
 
+    dict_samples = [r[0] for r in results]
+    var_samples = [r[1] for r in results]
     mle_dict = calculator.mle_dict
+    var_dict = calculator.var_dict
 
     poisson_lmbd_samples = array([d['poisson'] for d in dict_samples])
     poisson_ci = ci_from_bootstrap_samples(poisson_lmbd_samples,
@@ -159,6 +165,35 @@ def main(no_of_workers,
                           beta_poi_N_inv_ci]
     }
 
+    poisson_var_samples = array([d['poisson'] for d in var_samples])
+    poisson_var_ci = ci_from_bootstrap_samples(poisson_var_samples,
+                                           var_dict['poisson'],
+                                           confidence_level)
+    geo_var_samples = array([d['geometric'] for d in var_samples])
+    geo_var_ci = ci_from_bootstrap_samples(geo_var_samples,
+                                           var_dict['geometric'],
+                                           confidence_level)
+    neg_bin_var_samples = array([d['negative binomial'] for d in var_samples])
+    neg_bin_var_ci = ci_from_bootstrap_samples(neg_bin_var_samples,
+                                           var_dict['negative binomial'],
+                                           confidence_level)
+    zip_var_samples = array([d['zip'] for d in var_samples])
+    zip_var_ci = ci_from_bootstrap_samples(zip_var_samples,
+                                           var_dict['zip'],
+                                           confidence_level)
+    beta_poi_var_samples = array([d['beta-Poisson'] for d in var_samples])
+    beta_poi_var_ci = ci_from_bootstrap_samples(neg_bin_var_samples,
+                                           var_dict['beta-Poisson'],
+                                           confidence_level)
+
+    var_ci_dict = {
+        'poisson' : poisson_var_ci,
+        'geometric' : geo_var_ci,
+        'negative binomial' : neg_bin_var_ci,
+        'zip' : zip_var_ci,
+        'beta-Poisson' : beta_poi_var_ci
+    }
+
     llh_dict = generate_llh_dict(data_set, mle_dict)
 
 
@@ -168,7 +203,9 @@ def main(no_of_workers,
     with open(fname, 'wb') as f:
         dump(
             (mle_dict,
+            var_dict,
             ci_dict,
+            var_ci_dict,
             llh_dict),
             f)
 
