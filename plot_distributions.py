@@ -5,7 +5,7 @@ import numpy as np
 from pickle import load
 from scipy import stats
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_sars_data, mers_data, noro_data)
+    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
 
 data_name_list = [
@@ -14,7 +14,7 @@ data_name_list = [
     'fasina_ebola_data',
     'fay_ebola_data',
     'cdc_sars_data',
-    'cowling_sars_data',
+    'cowling_mers_data',
     'mers_data',
     'noro_data'
     ]
@@ -24,7 +24,7 @@ data_set_list = [
     fasina_ebola_data,
     fay_ebola_data,
     cdc_sars_data,
-    cowling_sars_data,
+    cowling_mers_data,
     mers_data,
     noro_data
     ]
@@ -42,7 +42,10 @@ for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
-        ci_dict) = load(f)
+        var_dict,
+        ci_dict,
+        var_ci_dict,
+        llh_dict) = load(f)
     mle_list.append(mle_dict)
 
 fig, axes = plt.subplots(4, 2, figsize=(6, 9))
