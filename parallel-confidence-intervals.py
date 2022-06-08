@@ -149,9 +149,9 @@ def main(no_of_workers,
     beta_poi_phi_ci = ci_from_bootstrap_samples(beta_poi_phi_samples,
                                                 mle_dict['beta-Poisson'][1],
                                                 confidence_level)
-    beta_poi_N_inv_samples = array(
+    beta_poi_nu_samples = array(
                             [d['beta-Poisson'][2] for d in dict_samples])
-    beta_poi_N_inv_ci = ci_from_bootstrap_samples(beta_poi_N_inv_samples,
+    beta_poi_nu_ci = ci_from_bootstrap_samples(beta_poi_nu_samples,
                                                   mle_dict['beta-Poisson'][2],
                                                   confidence_level)
 
@@ -162,7 +162,7 @@ def main(no_of_workers,
         'zip' : [zip_lmbd_ci, zip_sigma_ci],
         'beta-Poisson' : [beta_poi_lmbd_ci,
                           beta_poi_phi_ci,
-                          beta_poi_N_inv_ci]
+                          beta_poi_nu_ci]
     }
 
     poisson_var_samples = array([d['poisson'] for d in var_samples])

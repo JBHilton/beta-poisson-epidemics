@@ -137,7 +137,7 @@ def beta_poisson_pmf(x,lmbd,Phi,N):
     return P
 
 hyp1f1_alt=np.frompyfunc(mpmath.hyp1f1,3,1)
-def beta_poisson_loglh(data,lmbd,phi,N):
+def beta_poisson_loglh(data,lmbd,phi,nu):
     '''
     Calculate log likelihood of beta-Poisson parameters given data.
 
@@ -147,21 +147,26 @@ def beta_poisson_loglh(data,lmbd,phi,N):
             sample dataset
         lmbd : float
         phi : float
-        N : float
+        nu : float
+            Inverse contact parameter
 
     Returns
     -------
         llh : float
             log likelihood of parameters given data
     '''
-    llh=0
-    for x in data:
-        llh+=x*np.log(N)-np.real(spsp.loggamma(x+1))+np.real(spsp.loggamma(phi*N))+np.real(spsp.loggamma(x+phi*lmbd))-np.real(spsp.loggamma(x+phi*N))-np.real(spsp.loggamma(phi*lmbd))
-        if x+phi*N<50:
-            llh+=np.log(spsp.hyp1f1(x+phi*lmbd,x+phi*N,-N))
-        else:
-            llh+=np.log(float(hyp1f1_alt(x+phi*lmbd,x+phi*N,-N)))
-    return llh
+    if nu<1e-4:
+        return neg_bin_loglh(data,lmbd,phi)
+    else:
+        llh=0
+        N = 1/nu
+        for x in data:
+            llh+=x*np.log(N)-np.real(spsp.loggamma(x+1))+np.real(spsp.loggamma(phi*N))+np.real(spsp.loggamma(x+phi*lmbd))-np.real(spsp.loggamma(x+phi*N))-np.real(spsp.loggamma(phi*lmbd))
+            if x+phi*N<50:
+                llh+=np.log(spsp.hyp1f1(x+phi*lmbd,x+phi*N,-N))
+            else:
+                llh+=np.log(float(hyp1f1_alt(x+phi*lmbd,x+phi*N,-N)))
+        return llh
 
 def neg_bin_loglh(data,lmbd,phi):
     '''
@@ -186,7 +191,7 @@ def neg_bin_loglh(data,lmbd,phi):
         llh+=np.log(stats.nbinom.pmf(x,lmbd*phi,phi/(phi+1)))
     return llh
 
-def get_phi_and_N_mles(data,phi_0,N_0):
+def get_phi_and_N_mles(data,phi_0,nu_0):
     '''
     Calculate maximum likelihood estimates of beta-Poisson parameters Phi and N.
 
@@ -196,25 +201,23 @@ def get_phi_and_N_mles(data,phi_0,N_0):
             sample dataset
         phi_0 : float
             initial estimate of Phi
-        N_0 : float
-            initial estimate of N
+        nu_0 : float
+            initial estimate of nu
 
     Returns
     -------
         : float
             maximum likelihood estimate of Phi
         : float
-            maximum likelihood estimate of N
+            maximum likelihood estimate of nu
     '''
     def f(params):
         lmbd=np.mean(data)
         phi=params[0]
-        if params[1]>0.1e-3:
-            N=1/params[1]
-            return -beta_poisson_loglh(data,lmbd,phi,N)
-        else:
-            return -neg_bin_loglh(data,lmbd,phi)
-    mle=sp.optimize.minimize(f,[phi_0,N_0],bounds=((1e-6,50),(0,1/np.mean(data))))
+        nu=params[1]
+        return -beta_poisson_loglh(data,lmbd,phi,nu)
+
+    mle=sp.optimize.minimize(f,[phi_0,nu_0],bounds=((1e-6,50),(0,1/np.mean(data))))
     if mle.x[1]<0:
         mle.x[1]=0
     return mle.x[0],mle.x[1]
@@ -589,7 +592,7 @@ def get_lambda_and_phi_mles(data,lmbd_0,phi_0,N_emp):
 def generate_mle_dict(data,
                       theta_0,
                       phi_0,
-                      N_inv_0,
+                      nu_0,
                       lmbd_0,
                       sigma_0):
     '''
@@ -604,8 +607,8 @@ def generate_mle_dict(data,
             initial estimate of negative binomial overdispersion parameter
         phi_0 : float
             initial estimate of beta-Poisson parameter Phi
-        N_0 : float
-            initial estimate of beta-Poisson parameter Phi
+        nu_0 : float
+            initial estimate of beta-Poisson parameter nu
         lmbd_0 : float
             initial estimate of ZIP baseline lambda
         sigma_0 : float
@@ -618,7 +621,7 @@ def generate_mle_dict(data,
             each model.
     '''
     theta_mle=get_theta_mle(data, theta_0)
-    phi_mle,N_inv_mle=get_phi_and_N_mles(data, phi_0, N_inv_0)
+    phi_mle,nu_mle=get_phi_and_N_mles(data, phi_0, nu_0)
     lmbd_mle,sigma_mle=get_zip_mles(data, lmbd_0, sigma_0)
 
     mle_dict = {
@@ -626,7 +629,7 @@ def generate_mle_dict(data,
         'geometric' : np.mean(data),
         'negative binomial' : [np.mean(data), theta_mle],
         'zip' : [lmbd_mle, sigma_mle],
-        'beta-Poisson' : [np.mean(data), phi_mle, N_inv_mle]
+        'beta-Poisson' : [np.mean(data), phi_mle, nu_mle]
     }
 
     return mle_dict
@@ -714,7 +717,7 @@ def generate_llh_dict(data, mle_dict):
         bplh = beta_poisson_loglh(data,
                          mle_dict['beta-Poisson'][0],
                          mle_dict['beta-Poisson'][1],
-                         1 / mle_dict['beta-Poisson'][2])
+                         mle_dict['beta-Poisson'][2])
 
     llh_dict = {
         'poisson' : [plh, 2 - 2 * plh],
@@ -983,7 +986,7 @@ def neg_bin_bootstrap(data,no_samples,theta_0):
 
     return lmbd_mle,lmbd_ci,lmbd_samples,theta_mle,theta_ci,theta_samples,var_mle,var_ci,var_samples
 
-def beta_poisson_bootstrap(data,no_samples,phi_0,N_0):
+def beta_poisson_bootstrap(data,no_samples,phi_0,nu_0):
     '''
     Calculate confidence intervals for beta-Poisson parameter MLEs using
     bootstrapping.
@@ -996,7 +999,7 @@ def beta_poisson_bootstrap(data,no_samples,phi_0,N_0):
             number of samples to use in bootstrap
         phi_0 : float
             starting value of Phi to use in MLE calculations
-        N_0 : float
+        nu_0 : float
             starting value of N to use in MLE calculations
 
     Returns
@@ -1015,50 +1018,50 @@ def beta_poisson_bootstrap(data,no_samples,phi_0,N_0):
             phi
         phi_samples : array
             complete set of phi estimates generated during sampling process
-        N_inv_mle : float
+        nu_mle : float
             maximum likelihood estimate of 1/N
-        N_inv_ci : list
+        nu_ci : list
             list containing lower and upper 95% confidence intervals for MLE of
             1/N
-        N_inv_samples : array
-            complete set of N_inv estimates generated during sampling process
+        nu_samples : array
+            complete set of nu estimates generated during sampling process
             calculated from lambda and theta samples
     '''
 
     sample_size=np.size(data)
 
     lmbd_mle=np.mean(data)
-    phi_mle,N_inv_mle=get_phi_and_N_mles(data,phi_0,N_0)
-    var_mle=lmbd_mle*(1+(1-lmbd_mle*N_inv_mle)/(phi_mle+N_inv_mle))
+    phi_mle,nu_mle=get_phi_and_N_mles(data,phi_0,nu_0)
+    var_mle=lmbd_mle*(1+(1-lmbd_mle*nu_mle)/(phi_mle+nu_mle))
     lmbd_samples=np.zeros(no_samples)
     phi_samples=np.zeros(no_samples)
-    N_inv_samples=np.zeros(no_samples)
+    nu_samples=np.zeros(no_samples)
     print('Now calculating',no_samples,'bootstrap samples.')
     start_time=time.time()
 
     for i in range(no_samples):
         data_now=random.choices(data,k=sample_size)
         lmbd_samples[i]=np.mean(data_now)
-        phi_samples[i],N_inv_samples[i]=get_phi_and_N_mles(data_now,phi_0,N_0)
+        phi_samples[i],nu_samples[i]=get_phi_and_N_mles(data_now,phi_0,nu_0)
         if ((i+1)%100)==0:
             print('Sample',i+1,'of',no_samples,'completed.',time.time()-start_time,'seconds elapsed, approximately',(no_samples-i-1)*(time.time()-start_time)/(i+1),'remaining.')
 
     sample_array=np.zeros((no_samples,3))
     sample_array[:,1]=lmbd_samples # np.histogram does things in a slightly unintuitive order - this makes it come out right
     sample_array[:,0]=phi_samples
-    sample_array[:,2]=N_inv_samples
+    sample_array[:,2]=nu_samples
 
     lmbd_grid_length=int(100*np.max(lmbd_samples))+1
     lmbd_max_rdd=0.01*(lmbd_grid_length-1)
     phi_grid_length=int(100*np.max(phi_samples))+1
     phi_max_rdd=0.01*(phi_grid_length-1)
-    N_inv_grid_length=int(100*np.max(N_inv_samples))+1
-    N_inv_max_rdd=0.01*(N_inv_grid_length-1)
+    nu_grid_length=int(100*np.max(nu_samples))+1
+    nu_max_rdd=0.01*(nu_grid_length-1)
 
     H,edges=np.histogramdd(sample_array,
             bins=(np.linspace(0,lmbd_max_rdd,lmbd_grid_length),
                   np.linspace(0,phi_max_rdd,phi_grid_length),
-                  np.linspace(0,N_inv_max_rdd,N_inv_grid_length)))
+                  np.linspace(0,nu_max_rdd,nu_grid_length)))
     H_normed=H/np.sum(H)
     mle_loc=np.unravel_index(np.argmax(H_normed),H_normed.shape)
     current_max=H_normed[mle_loc]
@@ -1078,9 +1081,9 @@ def beta_poisson_bootstrap(data,no_samples,phi_0,N_0):
                 next_marker+=0.1
             print('Surpassed',next_marker-0.1,'at time',time.time()-start_time,'.')
     H_normed=H/np.sum(H)
-    lmbdgrid,phigrid,N_invgrid=np.meshgrid(edges[0],edges[1],edges[2])
+    lmbdgrid,phigrid,nugrid=np.meshgrid(edges[0],edges[1],edges[2])
     lmbd_ci=[np.min(lmbdgrid[np.where(H_normed>=current_max)]),np.max(lmbdgrid[np.where(H_normed>=current_max)])]
     phi_ci=[np.min(phigrid[np.where(H_normed>=current_max)]),np.max(phigrid[np.where(H_normed>=current_max)])]
-    N_inv_ci=[np.min(N_invgrid[np.where(H_normed>=current_max)]),np.max(N_invgrid[np.where(H_normed>=current_max)])]
+    nu_ci=[np.min(nugrid[np.where(H_normed>=current_max)]),np.max(nugrid[np.where(H_normed>=current_max)])]
 
-    return lmbd_mle,lmbd_ci,lmbd_samples,phi_mle,phi_ci,phi_samples,N_inv_mle,N_inv_ci,N_inv_samples
+    return lmbd_mle,lmbd_ci,lmbd_samples,phi_mle,phi_ci,phi_samples,nu_mle,nu_ci,nu_samples

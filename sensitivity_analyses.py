@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from numpy import arange, array, mean, meshgrid, percentile, size, var
+from numpy import arange, array, mean, meshgrid, percentile, size, var, zeros
 from os import mkdir
 from os.path import isdir, isfile
 from pickle import dump, load
@@ -30,9 +30,10 @@ class LLHCalculator:
         sample_var = var(data_set)
 
         self.data_set = data_set
+        self.mle_dict = mle_dict
         self.lmbd_mle = mle_dict['beta-Poisson'][0]
         self.phi_mle = mle_dict['beta-Poisson'][1]
-        self.N_mle = 1 / mle_dict['beta-Poisson'][2]
+        self.nu_mle = mle_dict['beta-Poisson'][2]
 
     def __call__(self, p):
         try:
@@ -47,56 +48,27 @@ class LLHCalculator:
 
     def _sensitivity_calculations(self, p):
 
-        print('p=',p)
-
         lmbd_p = p[0]
         phi_p = p[1]
-        if p[2]>0:
-            N_p = 1 / p[2]
+        nu_p = p[2]
 
-            lmbd_curve_val = beta_poisson_loglh(self.data_set,
-                                                lmbd_p,
-                                                self.phi_mle,
-                                                self.N_mle)
-            phi_curve_val = beta_poisson_loglh(self.data_set,
-                                               self.lmbd_mle,
-                                               phi_p,
-                                               self.N_mle)
-            N_inv_curve_val = beta_poisson_loglh(self.data_set,
-                                                 self.lmbd_mle,
-                                                 self.phi_mle,
-                                                 N_p)
-            lmbd_grid_val = beta_poisson_loglh(self.data_set,
-                                               self.lmbd_mle,
-                                               phi_p,
-                                               N_p)
-            phi_grid_val = beta_poisson_loglh(self.data_set, lmbd_p, self.phi_mle, N_p)
-            N_inv_grid_val = beta_poisson_loglh(self.data_set, lmbd_p, phi_p, self.N_mle)
-        else:
+        lmbd_grid_val = beta_poisson_loglh(self.data_set,
+                                           self.lmbd_mle,
+                                           phi_p,
+                                           nu_p)
+        phi_grid_val = beta_poisson_loglh(self.data_set,
+                                          lmbd_p,
+                                          self.phi_mle,
+                                          nu_p)
+        nu_grid_val = beta_poisson_loglh(self.data_set,
+                                         lmbd_p,
+                                         phi_p,
+                                         self.nu_mle)
 
-            lmbd_curve_val = beta_poisson_loglh(self.data_set,
-                                                lmbd_p,
-                                                self.phi_mle,
-                                                self.N_mle)
-            phi_curve_val = beta_poisson_loglh(self.data_set,
-                                               self.lmbd_mle,
-                                               phi_p,
-                                               self.N_mle)
-            N_inv_curve_val = neg_bin_loglh(self.data_set,
-                                            self.lmbd_mle,
-                                            self.phi_mle)
-            lmbd_grid_val = neg_bin_loglh(self.data_set,
-                                          self.lmbd_mle,
-                                          phi_p)
-            phi_grid_val = neg_bin_loglh(self.data_set, lmbd_p, self.phi_mle)
-            N_inv_grid_val = beta_poisson_loglh(self.data_set, lmbd_p, phi_p, self.N_mle)
-
-        return [lmbd_curve_val,
-                phi_curve_val,
-                N_inv_curve_val,
-                lmbd_grid_val,
+        return [lmbd_grid_val,
                 phi_grid_val,
-                N_inv_grid_val]
+                nu_grid_val,
+                p]
 
 def main(no_of_workers,
          data_name):
@@ -117,42 +89,58 @@ def main(no_of_workers,
 
     lmbd_vals = arange(.1, 5., .1)
     phi_vals = arange(.1, 10., .1)
-    N_inv_vals = arange(0., 1., .1)
-    no_vals = len(lmbd_vals) * len(phi_vals) * len(N_inv_vals)
+    nu_vals = arange(0., 1., .1)
+    no_vals = len(lmbd_vals) * len(phi_vals) * len(nu_vals)
 
-    L, P, N = meshgrid(lmbd_vals, phi_vals, N_inv_vals)
+    L, P, Nu = meshgrid(lmbd_vals, phi_vals, nu_vals)
     L = L.reshape(no_vals)
     P = P.reshape(no_vals)
-    N = N.reshape(no_vals)
+    Nu = Nu.reshape(no_vals)
 
-    params = [[L[i], P[i], N[i]] for i in range(no_vals)]
+    params = [[L[i], P[i], Nu[i]] for i in range(no_vals)]
 
     with Pool(no_of_workers) as pool:
         results = pool.map(calculator, params)
 
-    lmbd_curve = [r[0] for r in results]
-    phi_curve = [r[1] for r in results]
-    N_inv_curve = [r[2] for r in results]
-    lmbd_grid = [r[3] for r in results]
-    phi_grid = [r[4] for r in results]
-    N_inv_grid = [r[5] for r in results]
+
+    lmbd_curve = [beta_poisson_loglh(
+                    data_set,
+                    lmbd_p,
+                    mle_dict['beta-Poisson'][1],
+                    mle_dict['beta-Poisson'][2]) for lmbd_p in lmbd_vals]
+    phi_curve = [beta_poisson_loglh(
+                    data_set,
+                    mle_dict['beta-Poisson'][0],
+                    phi_p,
+                    mle_dict['beta-Poisson'][2]) for phi_p in phi_vals]
+    nu_curve = [beta_poisson_loglh(
+                    data_set,
+                    mle_dict['beta-Poisson'][0],
+                    mle_dict['beta-Poisson'][1],
+                    nu_p) for nu_p in nu_vals]
+    lmbd_grid = [r[0] for r in results]
+    phi_grid = [r[1] for r in results]
+    nu_grid = [r[2] for r in results]
 
     fname = 'outputs/sensitivity_analyses/'+data_name+'_results.pkl'
     with open(fname, 'wb') as f:
         dump(
-            (lmbd_curve,
+            (lmbd_vals,
+            phi_vals,
+            nu_vals,
+            lmbd_curve,
             phi_curve,
-            N_inv_curve,
+            nu_curve,
             lmbd_grid,
             phi_grid,
-            N_inv_grid),
+            nu_grid),
             f)
 
     return -1
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--no_of_workers', type=int, default=8)
+    parser.add_argument('--no_of_workers', type=int, default=4)
     parser.add_argument('--data_name',
                         type=str,
                         default='plague_data')
