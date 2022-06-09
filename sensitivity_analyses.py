@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from numpy import arange, array, mean, meshgrid, percentile, size, var, zeros
+from numpy import array, isnan, linspace, mean, meshgrid, percentile, size, var, where, zeros
 from os import mkdir
 from os.path import isdir, isfile
 from pickle import dump, load
@@ -25,14 +25,74 @@ data_dict = {
 if isdir('outputs/sensitivity_analyses') is False:
     mkdir('outputs/sensitivity_analyses')
 
-class LLHCalculator:
+class LmbdGridCalculator:
     def __init__(self, data_set, mle_dict):
         sample_var = var(data_set)
 
         self.data_set = data_set
         self.mle_dict = mle_dict
         self.lmbd_mle = mle_dict['beta-Poisson'][0]
+
+    def __call__(self, p):
+        try:
+            results = self._sensitivity_calculations(p)
+        except ValueError as err:
+            print(
+                'Exception raised for parameters={0}\n\tException: {1}'.format(
+                p, err)
+                )
+            return 0.0
+        return results
+
+    def _sensitivity_calculations(self, p):
+
+        phi_p = p[0]
+        nu_p = p[1]
+
+        lmbd_grid_val = beta_poisson_loglh(self.data_set,
+                                           self.lmbd_mle,
+                                           phi_p,
+                                           nu_p)
+
+        return lmbd_grid_val
+
+class PhiGridCalculator:
+    def __init__(self, data_set, mle_dict):
+        sample_var = var(data_set)
+
+        self.data_set = data_set
+        self.mle_dict = mle_dict
         self.phi_mle = mle_dict['beta-Poisson'][1]
+
+    def __call__(self, p):
+        try:
+            results = self._sensitivity_calculations(p)
+        except ValueError as err:
+            print(
+                'Exception raised for parameters={0}\n\tException: {1}'.format(
+                p, err)
+                )
+            return 0.0
+        return results
+
+    def _sensitivity_calculations(self, p):
+
+        lmbd_p = p[0]
+        nu_p = p[1]
+
+        phi_grid_val = beta_poisson_loglh(self.data_set,
+                                          lmbd_p,
+                                          self.phi_mle,
+                                          nu_p)
+
+        return phi_grid_val
+
+class NuGridCalculator:
+    def __init__(self, data_set, mle_dict):
+        sample_var = var(data_set)
+
+        self.data_set = data_set
+        self.mle_dict = mle_dict
         self.nu_mle = mle_dict['beta-Poisson'][2]
 
     def __call__(self, p):
@@ -50,25 +110,13 @@ class LLHCalculator:
 
         lmbd_p = p[0]
         phi_p = p[1]
-        nu_p = p[2]
 
-        lmbd_grid_val = beta_poisson_loglh(self.data_set,
-                                           self.lmbd_mle,
-                                           phi_p,
-                                           nu_p)
-        phi_grid_val = beta_poisson_loglh(self.data_set,
-                                          lmbd_p,
-                                          self.phi_mle,
-                                          nu_p)
         nu_grid_val = beta_poisson_loglh(self.data_set,
                                          lmbd_p,
                                          phi_p,
                                          self.nu_mle)
 
-        return [lmbd_grid_val,
-                phi_grid_val,
-                nu_grid_val,
-                p]
+        return nu_grid_val
 
 def main(no_of_workers,
          data_name):
@@ -84,23 +132,41 @@ def main(no_of_workers,
 
     data_set = data_dict[data_name]
 
-    results = []
-    calculator = LLHCalculator(data_set, mle_dict)
+    lmbd_results = []
+    phi_results = []
+    nu_results = []
+    lmbd_calculator = LmbdGridCalculator(data_set, mle_dict)
+    phi_calculator = PhiGridCalculator(data_set, mle_dict)
+    nu_calculator = NuGridCalculator(data_set, mle_dict)
 
-    lmbd_vals = arange(.1, 5., .1)
-    phi_vals = arange(.1, 10., .1)
-    nu_vals = arange(0., 1., .1)
+    lmbd_vals = linspace(.05, 5.05, 100)
+    phi_vals = linspace(.1, 10.1, 100)
+    nu_vals = linspace(0., 1., 100)
     no_vals = len(lmbd_vals) * len(phi_vals) * len(nu_vals)
 
-    L, P, Nu = meshgrid(lmbd_vals, phi_vals, nu_vals)
-    L = L.reshape(no_vals)
-    P = P.reshape(no_vals)
-    Nu = Nu.reshape(no_vals)
+    lmbd_grid_phi, lmbd_grid_nu = meshgrid(phi_vals, nu_vals)
+    phi_grid_lmbd, phi_grid_nu = meshgrid(lmbd_vals, nu_vals)
+    nu_grid_lmbd, nu_grid_phi = meshgrid(lmbd_vals, phi_vals)
 
-    params = [[L[i], P[i], Nu[i]] for i in range(no_vals)]
+    no_lmbd_vals = len(phi_vals) * len(nu_vals)
+    no_phi_vals = len(lmbd_vals) * len(nu_vals)
+    no_nu_vals = len(lmbd_vals) * len(phi_vals)
+
+    lmbd_grid_phi = lmbd_grid_phi.reshape(no_lmbd_vals)
+    lmbd_grid_nu = lmbd_grid_nu.reshape(no_lmbd_vals)
+    phi_grid_lmbd = phi_grid_lmbd.reshape(no_phi_vals)
+    phi_grid_nu = phi_grid_nu.reshape(no_phi_vals)
+    nu_grid_lmbd = nu_grid_lmbd.reshape(no_nu_vals)
+    nu_grid_phi = nu_grid_phi.reshape(no_nu_vals)
+
+    lmbd_params = [[lmbd_grid_phi[i], lmbd_grid_nu[i]] for i in range(no_lmbd_vals)]
+    phi_params = [[phi_grid_lmbd[i], phi_grid_nu[i]] for i in range(no_phi_vals)]
+    nu_params = [[nu_grid_lmbd[i], nu_grid_phi[i]] for i in range(no_nu_vals)]
 
     with Pool(no_of_workers) as pool:
-        results = pool.map(calculator, params)
+        lmbd_results = pool.map(lmbd_calculator, lmbd_params)
+        phi_results = pool.map(phi_calculator, phi_params)
+        nu_results = pool.map(nu_calculator, nu_params)
 
 
     lmbd_curve = [beta_poisson_loglh(
@@ -118,9 +184,9 @@ def main(no_of_workers,
                     mle_dict['beta-Poisson'][0],
                     mle_dict['beta-Poisson'][1],
                     nu_p) for nu_p in nu_vals]
-    lmbd_grid = [r[0] for r in results]
-    phi_grid = [r[1] for r in results]
-    nu_grid = [r[2] for r in results]
+    lmbd_grid = array([r for r in lmbd_results]).reshape(len(nu_vals), len(phi_vals))
+    phi_grid = array([r for r in phi_results]).reshape(len(nu_vals), len(lmbd_vals))
+    nu_grid = array([r for r in nu_results]).reshape(len(phi_vals), len(lmbd_vals))
 
     fname = 'outputs/sensitivity_analyses/'+data_name+'_results.pkl'
     with open(fname, 'wb') as f:
