@@ -143,11 +143,11 @@ for i in range(len(data_name_list)):
                    nu_vals_list[i][0],
                    nu_vals_list[i][-1]),
            aspect='auto')
-    lmbd_ax.plot(true_phi, true_nu, 'kx', markersize=2)
+    lmbd_ax.plot(true_phi, true_nu, 'kx', markersize=5)
     lmbd_ax.text(true_phi+0.01*phi_window, true_nu+0.02*nu_window, '($\hat{\Phi}$, $\hat{\\nu}$)', fontsize=9)
     lmbd_ax.set_xlabel('$\\Phi$')
     lmbd_ax.set_ylabel('$\\nu$')
-    lmbd_ax.text(-0.5, 1.1, 'a)',
+    lmbd_ax.text(-0.25 * phi_window, 1.1 * nu_window, 'a)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
     divider = make_axes_locatable(lmbd_ax)
@@ -169,11 +169,11 @@ for i in range(len(data_name_list)):
                    nu_vals_list[i][0],
                    nu_vals_list[i][-1]),
            aspect='auto')
-    phi_ax.plot(true_lmbd, true_nu, 'kx', markersize=2)
+    phi_ax.plot(true_lmbd, true_nu, 'kx', markersize=5)
     phi_ax.text(true_lmbd+0.01*lmbd_window, true_nu+0.02*nu_window, '($\hat{\lambda}$, $\hat{\\nu}$)', fontsize=9)
     phi_ax.set_xlabel('$\\lambda$')
     phi_ax.set_ylabel('$\\nu$')
-    phi_ax.text(-0.5, 1.1, 'b)',
+    phi_ax.text(-0.25 * lmbd_window, 1.1 * nu_window, 'b)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
     divider = make_axes_locatable(phi_ax)
@@ -195,11 +195,11 @@ for i in range(len(data_name_list)):
                    phi_vals_list[i][0],
                    phi_vals_list[i][-1]),
            aspect='auto')
-    nu_ax.plot(true_lmbd, true_phi, 'kx', markersize=2)
+    nu_ax.plot(true_lmbd, true_phi, 'kx', markersize=5)
     nu_ax.text(true_lmbd+0.01*lmbd_window, true_phi+0.02*phi_window, '($\hat{\lambda}$, $\hat{\Phi}$)', fontsize=9)
     nu_ax.set_xlabel('$\\lambda$')
     nu_ax.set_ylabel('$\\Phi$')
-    nu_ax.text(-0.5, 1.1, 'c)',
+    nu_ax.text(-0.25 * lmbd_window, 1.1 * phi_window, 'c)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
     divider = make_axes_locatable(nu_ax)
@@ -276,7 +276,7 @@ for i in range(len(data_name_list)):
     lmbd_ax.clabel(axim, fontsize=9, inline=1, fmt='%1.1f')
     lmbd_ax.set_xlabel('$\\Phi$')
     lmbd_ax.set_ylabel('$\\nu$')
-    lmbd_ax.text(-0.5, 1.1, 'a)',
+    lmbd_ax.text(-0.25 * phi_window, 1.1 * nu_window, 'a)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
@@ -293,7 +293,7 @@ for i in range(len(data_name_list)):
     phi_ax.clabel(axim, fontsize=9, inline=1, fmt='%1.1f')
     phi_ax.set_xlabel('$\\lambda$')
     phi_ax.set_ylabel('$\\nu$')
-    phi_ax.text(-0.5, 1.1, 'b)',
+    phi_ax.text(-0.25 * lmbd_window, 1.1 * nu_window, 'b)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
@@ -310,7 +310,7 @@ for i in range(len(data_name_list)):
     nu_ax.clabel(axim, fontsize=9, inline=1, fmt='%1.1f')
     nu_ax.set_xlabel('$\\lambda$')
     nu_ax.set_ylabel('$\\Phi$')
-    nu_ax.text(-0.5, 1.1, 'c)',
+    nu_ax.text(-0.25 * lmbd_window, 1.1 * phi_window, 'c)',
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
