@@ -95,7 +95,9 @@ for i, mle_dict in enumerate(mle_list):
 
 axes[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-fig.savefig('plots/'+'fitted_distributions.png',format='png',bbox_inches='tight')
+formats = ['.png', '.svg', '.eps']
+for fmt in formats:
+    fig.savefig('plots/'+'fitted_distributions'+fmt,bbox_inches='tight')
 
 # x = np.linspace(1e-2,1, 100)
 # y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)

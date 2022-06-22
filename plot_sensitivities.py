@@ -6,6 +6,8 @@ from scipy import stats
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
     fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
 
+formats = ['.png', '.svg', '.eps']
+
 data_name_list = [
     'plague_data',
     'monkeypox_data',
@@ -124,7 +126,8 @@ for i in range(len(data_name_list)):
             fontsize='medium', verticalalignment='top', fontfamily='serif',
             bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
-    fig.savefig('plots/'+data_name_list[i]+'_sensitivity_curves.png', bbox_inches='tight')
+    for fmt in formats:
+        fig.savefig('plots/'+data_name_list[i]+'_sensitivity_curves'+fmt, bbox_inches='tight')
     plt.close()
 
     fig, (lmbd_ax, phi_ax, nu_ax) = plt.subplots(1,
@@ -214,7 +217,8 @@ for i in range(len(data_name_list)):
     nu_ax.spines['right'].set_visible(False)
     cbar.outline.set_visible(False)
 
-    fig.savefig('plots/'+data_name_list[i]+'_sensitivity_grids.png', bbox_inches='tight')
+    for fmt in formats:
+        fig.savefig('plots/'+data_name_list[i]+'_sensitivity_grids'+fmt, bbox_inches='tight')
     plt.close()
 
     lmbd_grid_scale = 10**floor(log10(-lmbd_grid_list[i].mean()))
@@ -314,5 +318,6 @@ for i in range(len(data_name_list)):
                 fontsize='medium', verticalalignment='top', fontfamily='serif',
                 bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
-    fig.savefig('plots/'+data_name_list[i]+'_sensitivity_contours.png', bbox_inches='tight')
+    for fmt in formats:
+        fig.savefig('plots/'+data_name_list[i]+'_sensitivity_contours'+fmt, bbox_inches='tight')
     plt.close()
