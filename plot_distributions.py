@@ -95,7 +95,7 @@ for i, mle_dict in enumerate(mle_list):
 
 axes[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-fig.savefig('fitted_distributions.png',format='png',bbox_inches='tight')
+fig.savefig('plots/'+'fitted_distributions.png',format='png',bbox_inches='tight')
 
 # x = np.linspace(1e-2,1, 100)
 # y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)
@@ -108,4 +108,4 @@ fig.savefig('fitted_distributions.png',format='png',bbox_inches='tight')
 # plt.xticks()
 # plt.yticks()
 # plt.title('Beta distribution underlying Gani and Leach data')
-# fig.savefig('plague_beta_dist.png',format='png',bbox_inches='tight')
+# fig.savefig('plots/'+'plague_beta_dist.png',format='png',bbox_inches='tight')

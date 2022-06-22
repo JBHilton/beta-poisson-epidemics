@@ -140,7 +140,7 @@ def main(no_of_workers,
     nu_calculator = NuGridCalculator(data_set, mle_dict)
 
     lmbd_vals = linspace(.05, 5.05, 100)
-    phi_vals = linspace(.1, 10.1, 100)
+    phi_vals = linspace(.025, 5.025, 100)
     nu_vals = linspace(0., 1., 100)
     no_vals = len(lmbd_vals) * len(phi_vals) * len(nu_vals)
 
