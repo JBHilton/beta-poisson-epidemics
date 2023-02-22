@@ -10,7 +10,7 @@ from time import time as get_time
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
     fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
 from functions import (ci_from_bootstrap_samples, generate_llh_dict,
-    generate_mle_dict, generate_var_dict)
+    generate_mle_dict, generate_superspread_dict, generate_var_dict)
 
 data_dict = {
     'plague_data' : plague_data,
@@ -50,6 +50,8 @@ class MLECalculator:
                             sigma_0)
         self.var_dict = generate_var_dict(data_set,
                             self.mle_dict)
+        self.superspread_dict = generate_superspread_dict(data_set,
+                            self.mle_dict)
         self.sample_size = size(data_set)
 
     def __call__(self, p):
@@ -86,7 +88,9 @@ class MLECalculator:
                               zip_lmbd_0,
                               sigma_0)
         sample_vars = generate_var_dict(data_now, sample_dict)
-        return [sample_dict, sample_vars]
+        sample_props = generate_superspread_dict(data_now,
+                            sample_dict)
+        return [sample_dict, sample_vars, sample_props]
 
 def main(no_of_workers,
          no_samples,
@@ -104,8 +108,10 @@ def main(no_of_workers,
 
     dict_samples = [r[0] for r in results]
     var_samples = [r[1] for r in results]
+    superspread_samples = [r[2] for r in results]
     mle_dict = calculator.mle_dict
     var_dict = calculator.var_dict
+    superspread_dict = calculator.superspread_dict
 
     poisson_lmbd_samples = array([d['poisson'] for d in dict_samples])
     poisson_ci = ci_from_bootstrap_samples(poisson_lmbd_samples,
@@ -182,7 +188,7 @@ def main(no_of_workers,
                                            var_dict['zip'],
                                            confidence_level)
     beta_poi_var_samples = array([d['beta-Poisson'] for d in var_samples])
-    beta_poi_var_ci = ci_from_bootstrap_samples(neg_bin_var_samples,
+    beta_poi_var_ci = ci_from_bootstrap_samples(beta_poi_var_samples,
                                            var_dict['beta-Poisson'],
                                            confidence_level)
 
@@ -192,6 +198,35 @@ def main(no_of_workers,
         'negative binomial' : neg_bin_var_ci,
         'zip' : zip_var_ci,
         'beta-Poisson' : beta_poi_var_ci
+    }
+
+    poisson_superspread_samples = array([d['poisson'] for d in superspread_samples])
+    poisson_superspread_ci = ci_from_bootstrap_samples(poisson_superspread_samples,
+                                           superspread_dict['poisson'],
+                                           confidence_level)
+    geo_superspread_samples = array([d['geometric'] for d in superspread_samples])
+    geo_superspread_ci = ci_from_bootstrap_samples(geo_superspread_samples,
+                                           superspread_dict['geometric'],
+                                           confidence_level)
+    neg_bin_superspread_samples = array([d['negative binomial'] for d in superspread_samples])
+    neg_bin_superspread_ci = ci_from_bootstrap_samples(neg_bin_superspread_samples,
+                                           superspread_dict['negative binomial'],
+                                           confidence_level)
+    zip_superspread_samples = array([d['zip'] for d in superspread_samples])
+    zip_superspread_ci = ci_from_bootstrap_samples(zip_superspread_samples,
+                                           superspread_dict['zip'],
+                                           confidence_level)
+    beta_poi_superspread_samples = array([d['beta-Poisson'] for d in superspread_samples])
+    beta_poi_superspread_ci = ci_from_bootstrap_samples(beta_poi_superspread_samples,
+                                           superspread_dict['beta-Poisson'],
+                                           confidence_level)
+
+    superspread_ci_dict = {
+        'poisson' : poisson_superspread_ci,
+        'geometric' : geo_superspread_ci,
+        'negative binomial' : neg_bin_superspread_ci,
+        'zip' : zip_superspread_ci,
+        'beta-Poisson' : beta_poi_superspread_ci
     }
 
     llh_dict = generate_llh_dict(data_set, mle_dict)
@@ -204,8 +239,10 @@ def main(no_of_workers,
         dump(
             (mle_dict,
             var_dict,
+            superspread_dict,
             ci_dict,
             var_ci_dict,
+            superspread_ci_dict,
             llh_dict),
             f)
 

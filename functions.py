@@ -681,6 +681,56 @@ def generate_var_dict(data, mle_dict):
 
     return var_dict
 
+def generate_superspread_dict(data, mle_dict):
+    '''
+    Calculates proportions of superspreaders by Poisson 99th percentile definition of fitted distributions based on MLEs.
+
+    Parameters
+    ----------
+        data : list
+            sample dataset
+        mle_dict : dictionary
+            dictionary containing maximum likelihood estimates of parameters for
+            each model, outputted by generate_mle_dict
+
+    Returns
+    -------
+        var_dict : dictionary
+            dictionary containing model variance for each maximum
+            likelihood fit
+    '''
+
+    sample_mean = np.mean(data)
+
+    superspread_bd = int(stats.poisson(sample_mean).ppf(.99))
+
+    sample_prop = sum(np.array(data)>=superspread_bd) / len(data)
+
+    p_prop = .01
+    g_prop = 1 - stats.geom(1/(mle_dict['geometric']+1),-1).cdf(superspread_bd)
+    nb_prop = 1 - stats.nbinom(mle_dict['negative binomial'][0]/mle_dict['negative binomial'][1],
+        1/(mle_dict['negative binomial'][1]+1)).cdf(superspread_bd)
+    zip_prop = 1 - np.sum(zip_pmf(np.arange(superspread_bd + 1), mle_dict['zip'][0],mle_dict['zip'][1]))
+
+    if mle_dict['beta-Poisson'][2] < 1e-2:
+        bp_prop = nb_prop
+    else:
+        bp_prop = 1 - np.sum(beta_poisson_pmf(np.arange(superspread_bd + 1),
+            mle_dict['beta-Poisson'][0],
+            mle_dict['beta-Poisson'][1],
+            1/mle_dict['beta-Poisson'][2]))
+
+    superspread_dict = {
+        'sample' : sample_prop,
+        'poisson' : p_prop,
+        'geometric' : g_prop,
+        'negative binomial' : nb_prop,
+        'zip' : zip_prop,
+        'beta-Poisson' : bp_prop
+    }
+
+    return superspread_dict
+
 def generate_llh_dict(data, mle_dict):
     '''
     Calculates log likelihoods and AICs of fitted distributions.
