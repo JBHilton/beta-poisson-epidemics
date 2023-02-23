@@ -695,8 +695,8 @@ def generate_superspread_dict(data, mle_dict):
 
     Returns
     -------
-        var_dict : dictionary
-            dictionary containing model variance for each maximum
+        superspread_dict : dictionary
+            dictionary containing proportions of superspreaders for each maximum
             likelihood fit
     '''
 
@@ -730,6 +730,47 @@ def generate_superspread_dict(data, mle_dict):
     }
 
     return superspread_dict
+
+def generate_p0_dict(data, mle_dict):
+    '''
+    Calculates P[0] of fitted distributions based on MLEs.
+
+    Parameters
+    ----------
+        data : list
+            sample dataset
+        mle_dict : dictionary
+            dictionary containing maximum likelihood estimates of parameters for
+            each model, outputted by generate_mle_dict
+
+    Returns
+    -------
+        p0_dict : dictionary
+            dictionary p[0] for each maximum
+            likelihood fit
+    '''
+
+    nb_p0 = stats.nbinom(mle_dict['negative binomial'][0]/mle_dict['negative binomial'][1],
+            1/(mle_dict['negative binomial'][1]+1)).pmf(0)
+
+    if mle_dict['beta-Poisson'][2] < 1e-2:
+        bp_p0 = nb_p0
+    else:
+        bp_p0 = beta_poisson_pmf(0,
+            mle_dict['beta-Poisson'][0],
+            mle_dict['beta-Poisson'][1],
+            1/mle_dict['beta-Poisson'][2])
+
+    p0_dict = {
+        'sample' : data.count(0)/len(data),
+        'poisson' : stats.poisson(mle_dict['poisson']).pmf(0),
+        'geometric' : stats.geom(1/(mle_dict['geometric']+1),-1).pmf(0),
+        'negative binomial' : nb_p0,
+        'zip' : zip_pmf(0, mle_dict['zip'][0],mle_dict['zip'][1]),
+        'beta-Poisson' : bp_p0
+    }
+
+    return p0_dict
 
 def generate_llh_dict(data, mle_dict):
     '''

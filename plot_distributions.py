@@ -40,23 +40,31 @@ figlabels = ['a)',
     'h)']
 
 mle_list = []
+ci_list = []
 superspread_list = []
 superspread_ci_list = []
+p0_list = []
+p0_ci_list = []
 for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
-        var_dict,
-        superspread_dict,
-        ci_dict,
-        var_ci_dict,
-        superspread_ci_dict,
-        llh_dict) = load(f)
+            var_dict,
+            superspread_dict,
+            p0_dict,
+            ci_dict,
+            var_ci_dict,
+            superspread_ci_dict,
+            p0_ci_dict,
+            llh_dict) = load(f)
     mle_list.append(mle_dict)
+    ci_list.append(ci_dict)
     superspread_list.append(superspread_dict)
     superspread_ci_list.append(superspread_ci_dict)
+    p0_list.append(p0_dict)
+    p0_ci_list.append(p0_ci_dict)
 
-fig, axes = plt.subplots(4, 2, figsize=(6, 9))
+fig, axes = plt.subplots(4, 2, figsize=(12, 18))
 fig.tight_layout()
 axes = axes.flatten()
 
@@ -120,8 +128,9 @@ axes[0].legend(loc='center left', bbox_to_anchor=(3., 0.5))
 for fmt in formats:
     fig.savefig('plots/'+'fitted_distributions'+fmt,bbox_inches='tight')
 
-fig, axes = plt.subplots(4, 2, figsize=(6, 9))
+fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
 fig.tight_layout()
+plt.subplots_adjust(hspace=0.3)
 axes = axes.flatten()
 
 for i, superspread_dict in enumerate(superspread_list):
@@ -129,8 +138,8 @@ for i, superspread_dict in enumerate(superspread_list):
     superspread_ci_dict = superspread_ci_list[i]
 
     label_list = ['Data',
-                  'Beta-Poisson',
-                  'Negative Binomial',
+                  'Beta-\nPoisson',
+                  'Negative\nBinomial',
                   'Geometric',
                   'ZIP',
                   'Poisson']
@@ -151,7 +160,8 @@ for i, superspread_dict in enumerate(superspread_list):
 
     axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
     # axes[i].axis([-0.5, 4.5, 0, .1])
-    # axes[i].set_aspect(.1/5)
+    axes[i].set_ylim([0, 0.18])
+    axes[i].set_aspect(7/.18)
     axes[i].set_ylabel('Superspreading\n proportion')
     axes[i].set_xticklabels(label_list, rotation=45, ha='right')
 
@@ -163,6 +173,52 @@ for i, superspread_dict in enumerate(superspread_list):
 
 for fmt in formats:
     fig.savefig('plots/'+'superspread_props'+fmt,bbox_inches='tight')
+
+fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
+fig.tight_layout()
+plt.subplots_adjust(hspace=0.3)
+axes = axes.flatten()
+
+for i, p0_dict in enumerate(p0_list):
+
+    p0_ci_dict = p0_ci_list[i]
+
+    label_list = ['Data',
+                  'Beta-\nPoisson',
+                  'Negative\nBinomial',
+                  'Geometric',
+                  'ZIP',
+                  'Poisson']
+    
+    key_list = ['sample',
+                'beta-Poisson',
+                'negative binomial',
+                'geometric',
+                'zip',
+                'poisson']
+    
+    bar_vals = np.array([
+        p0_dict[key] for key in key_list
+    ])
+    bar_errs = np.vstack((np.array([0,0]),
+                         np.array([[p0_dict[key] - p0_ci_dict[key][0],  p0_ci_dict[key][1] - p0_dict[key]] for key in key_list[1:]]))
+    )
+
+    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
+    # axes[i].axis([-0.5, 4.5, 0, .1])
+    axes[i].set_ylim([0, 1])
+    axes[i].set_aspect(7/1)
+    axes[i].set_ylabel('Superspreading\n proportion')
+    axes[i].set_xticklabels(label_list, rotation=45, ha='right')
+
+    # axes[i].text(-4, 1, figlabels[i],
+    #         fontsize=12,
+    #         verticalalignment='top',
+    #         fontfamily='serif',
+    #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+
+for fmt in formats:
+    fig.savefig('plots/'+'p0_props'+fmt,bbox_inches='tight')
 
 # x = np.linspace(1e-2,1, 100)
 # y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)

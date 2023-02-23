@@ -33,16 +33,28 @@ data_set_list = [
 
 mle_list = []
 ci_list = []
-llh_list = []
+superspread_list = []
+superspread_ci_list = []
+p0_list = []
+p0_ci_list = []
 for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
-        ci_dict,
-        llh_dict) = load(f)
+            var_dict,
+            superspread_dict,
+            p0_dict,
+            ci_dict,
+            var_ci_dict,
+            superspread_ci_dict,
+            p0_ci_dict,
+            llh_dict) = load(f)
     mle_list.append(mle_dict)
     ci_list.append(ci_dict)
-    llh_list.append(llh_dict)
+    superspread_list.append(superspread_dict)
+    superspread_ci_list.append(superspread_ci_dict)
+    p0_list.append(p0_dict)
+    p0_ci_list.append(p0_ci_dict)
 
 print('''
 \\begin{table}[ht]
@@ -148,5 +160,48 @@ print('''
 	\bottomrule
 	\end{tabular}
 	\caption{Likelihood ratios of beta-Poisson to negative binomial and ZIP models under each dataset.}
+\end{table}
+''')
+
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\toprule
+		\\textbf{Dataset} & \\textbf{Boundary} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
+    \midrule
+		Plague & ''',np.round(superspread_list[0]['sample'], 2),''' & ''',np.round(superspread_list[0]['geometric'], 2),tuple(np.round(superspread_ci_list[0]['geometric'], 2)),''' & ''',np.round(superspread_list[0]['negative binomial'], 2),tuple(np.round(superspread_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(superspread_list[0]['zip'], 2),tuple(np.round(superspread_ci_list[0]['zip'], 2)),''' & ''',np.round(superspread_list[0]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[0]['beta-Poisson'], 2)),''' \\\\
+		Monkeypox & ''',np.round(superspread_list[1]['sample'], 2),''' & ''',np.round(superspread_list[1]['geometric'], 2),tuple(np.round(superspread_ci_list[1]['geometric'], 2)),''' & ''',np.round(superspread_list[1]['negative binomial'], 2),tuple(np.round(superspread_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(superspread_list[1]['zip'], 2),tuple(np.round(superspread_ci_list[1]['zip'], 2)),''' & ''',np.round(superspread_list[1]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Nigeria 2014 & ''',np.round(superspread_list[2]['sample'], 2),''' & ''',np.round(superspread_list[2]['geometric'], 2),tuple(np.round(superspread_ci_list[2]['geometric'], 2)),''' & ''',np.round(superspread_list[2]['negative binomial'], 2),tuple(np.round(superspread_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(superspread_list[2]['zip'], 2),tuple(np.round(superspread_ci_list[2]['zip'], 2)),''' & ''',np.round(superspread_list[2]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[2]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Guinea 2014 & ''',np.round(superspread_list[3]['sample'], 2),''' & ''',np.round(superspread_list[3]['geometric'], 2),tuple(np.round(superspread_ci_list[3]['geometric'], 2)),''' & ''',np.round(superspread_list[3]['negative binomial'], 2),tuple(np.round(superspread_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(superspread_list[3]['zip'], 2),tuple(np.round(superspread_ci_list[3]['zip'], 2)),''' & ''',np.round(superspread_list[3]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[3]['beta-Poisson'], 2)),''' \\\\
+		SARS, Singapore 2003 & ''',np.round(superspread_list[4]['sample'], 2),''' & ''',np.round(superspread_list[4]['geometric'], 2),tuple(np.round(superspread_ci_list[4]['geometric'], 2)),''' & ''',np.round(superspread_list[4]['negative binomial'], 2),tuple(np.round(superspread_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(superspread_list[4]['zip'], 2),tuple(np.round(superspread_ci_list[4]['zip'], 2)),''' & ''',np.round(superspread_list[4]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[4]['beta-Poisson'], 2)),''' \\\\
+		MERS, South Korea 2015 & ''',np.round(superspread_list[5]['sample'], 2),''' & ''',np.round(superspread_list[5]['geometric'], 2),tuple(np.round(superspread_ci_list[5]['geometric'], 2)),''' & ''',np.round(superspread_list[5]['negative binomial'], 2),tuple(np.round(superspread_ci_list[5]['negative binomial'], 2)),''' & ''',np.round(superspread_list[5]['zip'], 2),tuple(np.round(superspread_ci_list[5]['zip'], 2)),''' & ''',np.round(superspread_list[5]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[5]['beta-Poisson'], 2)),''' \\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(superspread_list[6]['sample'], 2),''' & ''',np.round(superspread_list[6]['geometric'], 2),tuple(np.round(superspread_ci_list[6]['geometric'], 2)),''' & ''',np.round(superspread_list[6]['negative binomial'], 2),tuple(np.round(superspread_ci_list[6]['negative binomial'], 2)),''' & ''',np.round(superspread_list[6]['zip'], 2),tuple(np.round(superspread_ci_list[6]['zip'], 2)),''' & ''',np.round(superspread_list[6]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[6]['beta-Poisson'], 2)),''' \\\\
+		Norovirus, Netherlands 2012 & ''',np.round(superspread_list[7]['sample'], 2),''' & ''',np.round(superspread_list[7]['geometric'], 2),tuple(np.round(superspread_ci_list[7]['geometric'], 2)),''' & ''',np.round(superspread_list[7]['negative binomial'], 2),tuple(np.round(superspread_ci_list[7]['negative binomial'], 2)),''' & ''',np.round(superspread_list[7]['zip'], 2),tuple(np.round(superspread_ci_list[7]['zip'], 2)),''' & ''',np.round(superspread_list[7]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[7]['beta-Poisson'], 2)),''' \\\\
+    \bottomrule
+	\end{tabular}
+	\caption{Superspreading boundary (99th percentile of fitted Poisson distribution) and proportion of cases above this boundary for each maximum likelihood distribution, 95\\% confidence intervals in parentheses.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\toprule
+		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
+    \midrule
+		Plague & ''',np.round(p0_list[0]['sample'], 2),''' & ''',np.round(p0_list[0]['poisson'], 2),tuple(np.round(p0_ci_list[0]['poisson'], 2)),''' & ''',np.round(p0_list[0]['geometric'], 2),tuple(np.round(p0_ci_list[0]['geometric'], 2)),''' & ''',np.round(p0_list[0]['negative binomial'], 2),tuple(np.round(p0_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(p0_list[0]['zip'], 2),tuple(np.round(p0_ci_list[0]['zip'], 2)),''' & ''',np.round(p0_list[0]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[0]['beta-Poisson'], 2)),''' \\\\
+		Monkeypox & ''',np.round(p0_list[1]['sample'], 2),''' & ''',np.round(p0_list[1]['poisson'], 2),tuple(np.round(p0_ci_list[1]['poisson'], 2)),''' & ''',np.round(p0_list[1]['geometric'], 2),tuple(np.round(p0_ci_list[1]['geometric'], 2)),''' & ''',np.round(p0_list[1]['negative binomial'], 2),tuple(np.round(p0_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(p0_list[1]['zip'], 2),tuple(np.round(p0_ci_list[1]['zip'], 2)),''' & ''',np.round(p0_list[1]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Nigeria 2014 & ''',np.round(p0_list[2]['sample'], 2),''' & ''',np.round(p0_list[2]['poisson'], 2),tuple(np.round(p0_ci_list[2]['poisson'], 2)),''' & ''',np.round(p0_list[2]['geometric'], 2),tuple(np.round(p0_ci_list[2]['geometric'], 2)),''' & ''',np.round(p0_list[2]['negative binomial'], 2),tuple(np.round(p0_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(p0_list[2]['zip'], 2),tuple(np.round(p0_ci_list[2]['zip'], 2)),''' & ''',np.round(p0_list[2]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[2]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Guinea 2014 & ''',np.round(p0_list[3]['sample'], 2),''' & ''',np.round(p0_list[3]['poisson'], 2),tuple(np.round(p0_ci_list[3]['poisson'], 2)),''' & ''',np.round(p0_list[3]['geometric'], 2),tuple(np.round(p0_ci_list[3]['geometric'], 2)),''' & ''',np.round(p0_list[3]['negative binomial'], 2),tuple(np.round(p0_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(p0_list[3]['zip'], 2),tuple(np.round(p0_ci_list[3]['zip'], 2)),''' & ''',np.round(p0_list[3]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[3]['beta-Poisson'], 2)),''' \\\\
+		SARS, Singapore 2003 & ''',np.round(p0_list[4]['sample'], 2),''' & ''',np.round(p0_list[4]['poisson'], 2),tuple(np.round(p0_ci_list[4]['poisson'], 2)),''' & ''',np.round(p0_list[4]['geometric'], 2),tuple(np.round(p0_ci_list[4]['geometric'], 2)),''' & ''',np.round(p0_list[4]['negative binomial'], 2),tuple(np.round(p0_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(p0_list[4]['zip'], 2),tuple(np.round(p0_ci_list[4]['zip'], 2)),''' & ''',np.round(p0_list[4]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[4]['beta-Poisson'], 2)),''' \\\\
+		MERS, South Korea 2015 & ''',np.round(p0_list[5]['sample'], 2),''' & ''',np.round(p0_list[5]['poisson'], 2),tuple(np.round(p0_ci_list[5]['poisson'], 2)),''' & ''',np.round(p0_list[5]['geometric'], 2),tuple(np.round(p0_ci_list[5]['geometric'], 2)),''' & ''',np.round(p0_list[5]['negative binomial'], 2),tuple(np.round(p0_ci_list[5]['negative binomial'], 2)),''' & ''',np.round(p0_list[5]['zip'], 2),tuple(np.round(p0_ci_list[5]['zip'], 2)),''' & ''',np.round(p0_list[5]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[5]['beta-Poisson'], 2)),''' \\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(p0_list[6]['sample'], 2),''' & ''',np.round(p0_list[6]['poisson'], 2),tuple(np.round(p0_ci_list[6]['poisson'], 2)),''' & ''',np.round(p0_list[6]['geometric'], 2),tuple(np.round(p0_ci_list[6]['geometric'], 2)),''' & ''',np.round(p0_list[6]['negative binomial'], 2),tuple(np.round(p0_ci_list[6]['negative binomial'], 2)),''' & ''',np.round(p0_list[6]['zip'], 2),tuple(np.round(p0_ci_list[6]['zip'], 2)),''' & ''',np.round(p0_list[6]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[6]['beta-Poisson'], 2)),''' \\\\
+		Norovirus, Netherlands 2012 & ''',np.round(p0_list[7]['sample'], 2),''' & ''',np.round(p0_list[7]['poisson'], 2),tuple(np.round(p0_ci_list[7]['poisson'], 2)),''' & ''',np.round(p0_list[7]['geometric'], 2),tuple(np.round(p0_ci_list[7]['geometric'], 2)),''' & ''',np.round(p0_list[7]['negative binomial'], 2),tuple(np.round(p0_ci_list[7]['negative binomial'], 2)),''' & ''',np.round(p0_list[7]['zip'], 2),tuple(np.round(p0_ci_list[7]['zip'], 2)),''' & ''',np.round(p0_list[7]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[7]['beta-Poisson'], 2)),''' \\\\
+    \bottomrule
+	\end{tabular}
+	\caption{Probabliity of a case generating zero secondary cases under each maximum likelihood distribution, 95\\% confidence intervals in parentheses.}
 \end{table}
 ''')

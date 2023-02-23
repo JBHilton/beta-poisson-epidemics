@@ -10,7 +10,7 @@ from time import time as get_time
 from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
     fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
 from functions import (ci_from_bootstrap_samples, generate_llh_dict,
-    generate_mle_dict, generate_superspread_dict, generate_var_dict)
+    generate_mle_dict, generate_p0_dict, generate_superspread_dict, generate_var_dict)
 
 data_dict = {
     'plague_data' : plague_data,
@@ -52,6 +52,8 @@ class MLECalculator:
                             self.mle_dict)
         self.superspread_dict = generate_superspread_dict(data_set,
                             self.mle_dict)
+        self.p0_dict = generate_p0_dict(data_set,
+                            self.mle_dict)
         self.sample_size = size(data_set)
 
     def __call__(self, p):
@@ -90,7 +92,8 @@ class MLECalculator:
         sample_vars = generate_var_dict(data_now, sample_dict)
         sample_props = generate_superspread_dict(data_now,
                             sample_dict)
-        return [sample_dict, sample_vars, sample_props]
+        sample_p0 = generate_p0_dict(data_now, sample_dict)
+        return [sample_dict, sample_vars, sample_props, sample_p0]
 
 def main(no_of_workers,
          no_samples,
@@ -109,9 +112,11 @@ def main(no_of_workers,
     dict_samples = [r[0] for r in results]
     var_samples = [r[1] for r in results]
     superspread_samples = [r[2] for r in results]
+    p0_samples = [r[3] for r in results]
     mle_dict = calculator.mle_dict
     var_dict = calculator.var_dict
     superspread_dict = calculator.superspread_dict
+    p0_dict = calculator.p0_dict
 
     poisson_lmbd_samples = array([d['poisson'] for d in dict_samples])
     poisson_ci = ci_from_bootstrap_samples(poisson_lmbd_samples,
@@ -229,6 +234,35 @@ def main(no_of_workers,
         'beta-Poisson' : beta_poi_superspread_ci
     }
 
+    poisson_p0_samples = array([d['poisson'] for d in p0_samples])
+    poisson_p0_ci = ci_from_bootstrap_samples(poisson_p0_samples,
+                                           p0_dict['poisson'],
+                                           confidence_level)
+    geo_p0_samples = array([d['geometric'] for d in p0_samples])
+    geo_p0_ci = ci_from_bootstrap_samples(geo_p0_samples,
+                                           p0_dict['geometric'],
+                                           confidence_level)
+    neg_bin_p0_samples = array([d['negative binomial'] for d in p0_samples])
+    neg_bin_p0_ci = ci_from_bootstrap_samples(neg_bin_p0_samples,
+                                           p0_dict['negative binomial'],
+                                           confidence_level)
+    zip_p0_samples = array([d['zip'] for d in p0_samples])
+    zip_p0_ci = ci_from_bootstrap_samples(zip_p0_samples,
+                                           p0_dict['zip'],
+                                           confidence_level)
+    beta_poi_p0_samples = array([d['beta-Poisson'] for d in p0_samples])
+    beta_poi_p0_ci = ci_from_bootstrap_samples(beta_poi_p0_samples,
+                                           p0_dict['beta-Poisson'],
+                                           confidence_level)
+
+    p0_ci_dict = {
+        'poisson' : poisson_p0_ci,
+        'geometric' : geo_p0_ci,
+        'negative binomial' : neg_bin_p0_ci,
+        'zip' : zip_p0_ci,
+        'beta-Poisson' : beta_poi_p0_ci
+    }
+
     llh_dict = generate_llh_dict(data_set, mle_dict)
 
 
@@ -240,9 +274,11 @@ def main(no_of_workers,
             (mle_dict,
             var_dict,
             superspread_dict,
+            p0_dict,
             ci_dict,
             var_ci_dict,
             superspread_ci_dict,
+            p0_ci_dict,
             llh_dict),
             f)
 
