@@ -4,30 +4,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pickle import load
 from scipy import stats
-from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from datasets import (plague_data, mpox_data, nigeria_ebola_data,
+    guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
 
 formats = ['.png', '.svg', '.eps']
 
 data_name_list = [
     'plague_data',
-    'monkeypox_data',
-    'fasina_ebola_data',
-    'fay_ebola_data',
-    'cdc_sars_data',
-    'cowling_mers_data',
-    'mers_data',
+    'mpox_data',
+    'nigeria_ebola_data',
+    'guinea_ebola_data',
+    'singapore_sars_data',
+    'sk_mers_data',
+    'sa_mers_data',
     'noro_data'
     ]
 data_set_list = [
     plague_data,
-    monkeypox_data,
-    fasina_ebola_data,
-    fay_ebola_data,
-    cdc_sars_data,
-    cowling_mers_data,
-    mers_data,
+    mpox_data,
+    nigeria_ebola_data,
+    guinea_ebola_data,
+    singapore_sars_data,
+    sk_mers_data,
+    sa_mers_data,
     noro_data
     ]
 figlabels = ['a)',

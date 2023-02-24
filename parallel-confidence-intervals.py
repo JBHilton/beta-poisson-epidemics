@@ -7,19 +7,19 @@ from random import choices
 from copy import deepcopy
 from multiprocessing import Pool
 from time import time as get_time
-from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from datasets import (plague_data, mpox_data, nigeria_ebola_data,
+    guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import (ci_from_bootstrap_samples, generate_llh_dict,
     generate_mle_dict, generate_p0_dict, generate_superspread_dict, generate_var_dict)
 
 data_dict = {
     'plague_data' : plague_data,
-    'monkeypox_data' : monkeypox_data,
-    'fasina_ebola_data' : fasina_ebola_data,
-    'fay_ebola_data' : fay_ebola_data,
-    'cdc_sars_data' : cdc_sars_data,
-    'cowling_mers_data' : cowling_mers_data,
-    'mers_data' : mers_data,
+    'mpox_data' : mpox_data,
+    'nigeria_ebola_data' : nigeria_ebola_data,
+    'guinea_ebola_data' : guinea_ebola_data,
+    'singapore_sars_data' : singapore_sars_data,
+    'sk_mers_data' : sk_mers_data,
+    'sa_mers_data' : sa_mers_data,
     'noro_data' :noro_data
     }
 

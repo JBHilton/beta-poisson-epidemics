@@ -4,30 +4,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pickle import load
 from scipy import stats
-from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from datasets import (plague_data, mpox_data, nigeria_ebola_data,
+    guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
 
 np.set_printoptions(precision=2)
 
 data_name_list = [
     'plague_data',
-    'monkeypox_data',
-    'fasina_ebola_data',
-    'fay_ebola_data',
-    'cdc_sars_data',
-    'cowling_mers_data',
-    'mers_data',
+    'mpox_data',
+    'nigeria_ebola_data',
+    'guinea_ebola_data',
+    'singapore_sars_data',
+    'sk_mers_data',
+    'sa_mers_data',
     'noro_data'
     ]
 data_set_list = [
     plague_data,
-    monkeypox_data,
-    fasina_ebola_data,
-    fay_ebola_data,
-    cdc_sars_data,
-    cowling_mers_data,
-    mers_data,
+    mpox_data,
+    nigeria_ebola_data,
+    guinea_ebola_data,
+    singapore_sars_data,
+    sk_mers_data,
+    sa_mers_data,
     noro_data
     ]
 
@@ -70,7 +70,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(mle_list[0]['poisson'], 2),tuple(np.round(ci_list[0]['poisson'], 2)),''' & ''',np.round(mle_list[0]['geometric'], 2),tuple(np.round(ci_list[0]['geometric'], 2)),''' & ''',np.round(mle_list[0]['negative binomial'][0], 2),tuple(np.round(ci_list[0]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[0]['zip'][0], 2),tuple(np.round(ci_list[0]['zip'][0], 2)),''' & ''',np.round(mle_list[0]['beta-Poisson'][0], 2),tuple(np.round(ci_list[0]['beta-Poisson'][0], 2)),''' \\\\
-		Monkeypox & ''',np.round(mle_list[1]['poisson'], 2),tuple(np.round(ci_list[1]['poisson'], 2)),''' & ''',np.round(mle_list[1]['geometric'], 2),tuple(np.round(ci_list[1]['geometric'], 2)),''' & ''',np.round(mle_list[1]['negative binomial'][0], 2),tuple(np.round(ci_list[1]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[1]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][0], 2),tuple(np.round(ci_list[1]['beta-Poisson'][0], 2)),''' \\\\
+		Mpox & ''',np.round(mle_list[1]['poisson'], 2),tuple(np.round(ci_list[1]['poisson'], 2)),''' & ''',np.round(mle_list[1]['geometric'], 2),tuple(np.round(ci_list[1]['geometric'], 2)),''' & ''',np.round(mle_list[1]['negative binomial'][0], 2),tuple(np.round(ci_list[1]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[1]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][0], 2),tuple(np.round(ci_list[1]['beta-Poisson'][0], 2)),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['poisson'], 2),tuple(np.round(ci_list[2]['poisson'], 2)),''' & ''',np.round(mle_list[2]['geometric'], 2),tuple(np.round(ci_list[2]['geometric'], 2)),''' & ''',np.round(mle_list[2]['negative binomial'][0], 2),tuple(np.round(ci_list[2]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[2]['zip'][0], 2),tuple(np.round(ci_list[2]['zip'][0], 2)),''' & ''',np.round(mle_list[2]['beta-Poisson'][0], 2),tuple(np.round(ci_list[2]['beta-Poisson'][0], 2)),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(mle_list[3]['poisson'], 2),tuple(np.round(ci_list[3]['poisson'], 2)),''' & ''',np.round(mle_list[3]['geometric'], 2),tuple(np.round(ci_list[3]['geometric'], 2)),''' & ''',np.round(mle_list[3]['negative binomial'][0], 2),tuple(np.round(ci_list[3]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[3]['zip'][0], 2),tuple(np.round(ci_list[3]['zip'][0], 2)),''' & ''',np.round(mle_list[3]['beta-Poisson'][0], 2),tuple(np.round(ci_list[3]['beta-Poisson'][0], 2)),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(mle_list[4]['poisson'], 2),tuple(np.round(ci_list[4]['poisson'], 2)),''' & ''',np.round(mle_list[4]['geometric'], 2),tuple(np.round(ci_list[4]['geometric'], 2)),''' & ''',np.round(mle_list[4]['negative binomial'][0], 2),tuple(np.round(ci_list[4]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[4]['zip'][0], 2),tuple(np.round(ci_list[4]['zip'][0], 2)),''' & ''',np.round(mle_list[4]['beta-Poisson'][0], 2),tuple(np.round(ci_list[4]['beta-Poisson'][0], 2)),''' \\\\
@@ -91,7 +91,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Sample mean} $\\lambda$ & \\textbf{Neg. bin. } $\\theta$ & \\textbf{ZIP} $\\tilde{\lambda}$ & \\textbf{ZIP} $\sigma$ & \\textbf{Beta-Poisson} $\Phi$ & \\textbf{Beta-Poisson} $N$ \\
     \midrule
 		Plague & ''',np.round(mle_list[0]['poisson'], 2),tuple(np.round(ci_list[0]['poisson'], 2)),''' & ''',np.round(mle_list[0]['negative binomial'][1], 2),tuple(np.round(ci_list[0]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[0]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[0]['zip'][1], 2),tuple(np.round(ci_list[0]['zip'][1], 2)),''' & ''',np.round(mle_list[0]['beta-Poisson'][1], 2),tuple(np.round(ci_list[0]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[0]['beta-Poisson'][2], 2),tuple(np.round(ci_list[0]['beta-Poisson'][2], 2)),'''\\
-		Monkeypox & ''',np.round(mle_list[1]['poisson'], 2),tuple(np.round(ci_list[1]['poisson'], 2)),''' & ''',np.round(mle_list[1]['negative binomial'][1], 2),tuple(np.round(ci_list[1]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[1]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[1]['zip'][1], 2),tuple(np.round(ci_list[1]['zip'][1], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][1], 2),tuple(np.round(ci_list[1]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][2], 2),tuple(np.round(ci_list[1]['beta-Poisson'][2], 2)),'''\\
+		Mpox & ''',np.round(mle_list[1]['poisson'], 2),tuple(np.round(ci_list[1]['poisson'], 2)),''' & ''',np.round(mle_list[1]['negative binomial'][1], 2),tuple(np.round(ci_list[1]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[1]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[1]['zip'][1], 2),tuple(np.round(ci_list[1]['zip'][1], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][1], 2),tuple(np.round(ci_list[1]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][2], 2),tuple(np.round(ci_list[1]['beta-Poisson'][2], 2)),'''\\
 		Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['poisson'], 2),tuple(np.round(ci_list[2]['poisson'], 2)),''' & ''',np.round(mle_list[2]['negative binomial'][1], 2),tuple(np.round(ci_list[2]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[2]['zip'][0], 2),tuple(np.round(ci_list[2]['zip'][0], 2)),''' & ''',np.round(mle_list[2]['zip'][1], 2),tuple(np.round(ci_list[2]['zip'][1], 2)),''' & ''',np.round(mle_list[2]['beta-Poisson'][1], 2),tuple(np.round(ci_list[2]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[2]['beta-Poisson'][2], 2),tuple(np.round(ci_list[2]['beta-Poisson'][2], 2)),'''\\
 		Ebola, Guinea 2014 & ''',np.round(mle_list[3]['poisson'], 2),tuple(np.round(ci_list[3]['poisson'], 2)),''' & ''',np.round(mle_list[3]['negative binomial'][1], 2),tuple(np.round(ci_list[3]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[3]['zip'][0], 2),tuple(np.round(ci_list[3]['zip'][0], 2)),''' & ''',np.round(mle_list[3]['zip'][1], 2),tuple(np.round(ci_list[3]['zip'][1], 2)),''' & ''',np.round(mle_list[3]['beta-Poisson'][1], 2),tuple(np.round(ci_list[3]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[3]['beta-Poisson'][2], 2),tuple(np.round(ci_list[3]['beta-Poisson'][2], 2)),'''\\
 		SARS, Singapore 2003 & ''',np.round(mle_list[4]['poisson'], 2),tuple(np.round(ci_list[4]['poisson'], 2)),''' & ''',np.round(mle_list[4]['negative binomial'][1], 2),tuple(np.round(ci_list[4]['negative binomial'][1], 2)),''' & ''',np.round(mle_list[4]['zip'][0], 2),tuple(np.round(ci_list[4]['zip'][0], 2)),''' & ''',np.round(mle_list[4]['zip'][1], 2),tuple(np.round(ci_list[4]['zip'][1], 2)),''' & ''',np.round(mle_list[4]['beta-Poisson'][1], 2),tuple(np.round(ci_list[4]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[4]['beta-Poisson'][2], 2),tuple(np.round(ci_list[4]['beta-Poisson'][2], 2)),'''\\
@@ -114,7 +114,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(llh_list[0]['poisson'][0], 2),''' & ''',np.round(llh_list[0]['geometric'][0], 2),''' & ''',np.round(llh_list[0]['negative binomial'][0], 2),''' & ''',np.round(llh_list[0]['zip'][0], 2),''' & ''',np.round(llh_list[0]['beta-Poisson'][0], 2),''' \\\\
-		Monkeypox & ''',np.round(llh_list[1]['poisson'][0], 2),''' & ''',np.round(llh_list[1]['geometric'][0], 2),''' & ''',np.round(llh_list[1]['negative binomial'][0], 2),''' & ''',np.round(llh_list[1]['zip'][0], 2),''' & ''',np.round(llh_list[1]['beta-Poisson'][0], 2),''' \\\\
+		Mpox & ''',np.round(llh_list[1]['poisson'][0], 2),''' & ''',np.round(llh_list[1]['geometric'][0], 2),''' & ''',np.round(llh_list[1]['negative binomial'][0], 2),''' & ''',np.round(llh_list[1]['zip'][0], 2),''' & ''',np.round(llh_list[1]['beta-Poisson'][0], 2),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(llh_list[2]['poisson'][0], 2),''' & ''',np.round(llh_list[2]['geometric'][0], 2),''' & ''',np.round(llh_list[2]['negative binomial'][0], 2),''' & ''',np.round(llh_list[2]['zip'][0], 2),''' & ''',np.round(llh_list[2]['beta-Poisson'][0], 2),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(llh_list[3]['poisson'][0], 2),''' & ''',np.round(llh_list[3]['geometric'][0], 2),''' & ''',np.round(llh_list[3]['negative binomial'][0], 2),''' & ''',np.round(llh_list[3]['zip'][0], 2),''' & ''',np.round(llh_list[3]['beta-Poisson'][0], 2),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(llh_list[4]['poisson'][0], 2),''' & ''',np.round(llh_list[4]['geometric'][0], 2),''' & ''',np.round(llh_list[4]['negative binomial'][0], 2),''' & ''',np.round(llh_list[4]['zip'][0], 2),''' & ''',np.round(llh_list[4]['beta-Poisson'][0], 2),''' \\\\
@@ -135,7 +135,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(llh_list[0]['poisson'][1], 2),''' & ''',np.round(llh_list[0]['geometric'][1], 2),''' & ''',np.round(llh_list[0]['negative binomial'][1], 2),''' & ''',np.round(llh_list[0]['zip'][1], 2),''' & ''',np.round(llh_list[0]['beta-Poisson'][1], 2),''' \\\\
-		Monkeypox & ''',np.round(llh_list[1]['poisson'][1], 2),''' & ''',np.round(llh_list[1]['geometric'][1], 2),''' & ''',np.round(llh_list[1]['negative binomial'][1], 2),''' & ''',np.round(llh_list[1]['zip'][1], 2),''' & ''',np.round(llh_list[1]['beta-Poisson'][1], 2),''' \\\\
+		Mpox & ''',np.round(llh_list[1]['poisson'][1], 2),''' & ''',np.round(llh_list[1]['geometric'][1], 2),''' & ''',np.round(llh_list[1]['negative binomial'][1], 2),''' & ''',np.round(llh_list[1]['zip'][1], 2),''' & ''',np.round(llh_list[1]['beta-Poisson'][1], 2),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(llh_list[2]['poisson'][1], 2),''' & ''',np.round(llh_list[2]['geometric'][1], 2),''' & ''',np.round(llh_list[2]['negative binomial'][1], 2),''' & ''',np.round(llh_list[2]['zip'][1], 2),''' & ''',np.round(llh_list[2]['beta-Poisson'][1], 2),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(llh_list[3]['poisson'][1], 2),''' & ''',np.round(llh_list[3]['geometric'][1], 2),''' & ''',np.round(llh_list[3]['negative binomial'][1], 2),''' & ''',np.round(llh_list[3]['zip'][1], 2),''' & ''',np.round(llh_list[3]['beta-Poisson'][1], 2),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(llh_list[4]['poisson'][1], 2),''' & ''',np.round(llh_list[4]['geometric'][1], 2),''' & ''',np.round(llh_list[4]['negative binomial'][1], 2),''' & ''',np.round(llh_list[4]['zip'][1], 2),''' & ''',np.round(llh_list[4]['beta-Poisson'][1], 2),''' \\\\
@@ -156,7 +156,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Neg. bin. } & \\textbf{ZIP} \\\\
     \midrule
 		Plague & ''',np.round(np.exp(llh_list[0]['negative binomial'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[0]['zip'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' \\\\
-		Monkeypox & ''',np.round(np.exp(llh_list[1]['negative binomial'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['zip'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' \\\\
+		Mpox & ''',np.round(np.exp(llh_list[1]['negative binomial'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['zip'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(np.exp(llh_list[2]['negative binomial'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[2]['zip'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(np.exp(llh_list[3]['negative binomial'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[3]['zip'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(np.exp(llh_list[4]['negative binomial'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[4]['zip'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' \\\\
@@ -178,7 +178,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Boundary} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(superspread_list[0]['sample'], 2),''' & ''',np.round(superspread_list[0]['geometric'], 2),tuple(np.round(superspread_ci_list[0]['geometric'], 2)),''' & ''',np.round(superspread_list[0]['negative binomial'], 2),tuple(np.round(superspread_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(superspread_list[0]['zip'], 2),tuple(np.round(superspread_ci_list[0]['zip'], 2)),''' & ''',np.round(superspread_list[0]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[0]['beta-Poisson'], 2)),''' \\\\
-		Monkeypox & ''',np.round(superspread_list[1]['sample'], 2),''' & ''',np.round(superspread_list[1]['geometric'], 2),tuple(np.round(superspread_ci_list[1]['geometric'], 2)),''' & ''',np.round(superspread_list[1]['negative binomial'], 2),tuple(np.round(superspread_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(superspread_list[1]['zip'], 2),tuple(np.round(superspread_ci_list[1]['zip'], 2)),''' & ''',np.round(superspread_list[1]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Mpox & ''',np.round(superspread_list[1]['sample'], 2),''' & ''',np.round(superspread_list[1]['geometric'], 2),tuple(np.round(superspread_ci_list[1]['geometric'], 2)),''' & ''',np.round(superspread_list[1]['negative binomial'], 2),tuple(np.round(superspread_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(superspread_list[1]['zip'], 2),tuple(np.round(superspread_ci_list[1]['zip'], 2)),''' & ''',np.round(superspread_list[1]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[1]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(superspread_list[2]['sample'], 2),''' & ''',np.round(superspread_list[2]['geometric'], 2),tuple(np.round(superspread_ci_list[2]['geometric'], 2)),''' & ''',np.round(superspread_list[2]['negative binomial'], 2),tuple(np.round(superspread_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(superspread_list[2]['zip'], 2),tuple(np.round(superspread_ci_list[2]['zip'], 2)),''' & ''',np.round(superspread_list[2]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[2]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(superspread_list[3]['sample'], 2),''' & ''',np.round(superspread_list[3]['geometric'], 2),tuple(np.round(superspread_ci_list[3]['geometric'], 2)),''' & ''',np.round(superspread_list[3]['negative binomial'], 2),tuple(np.round(superspread_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(superspread_list[3]['zip'], 2),tuple(np.round(superspread_ci_list[3]['zip'], 2)),''' & ''',np.round(superspread_list[3]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[3]['beta-Poisson'], 2)),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(superspread_list[4]['sample'], 2),''' & ''',np.round(superspread_list[4]['geometric'], 2),tuple(np.round(superspread_ci_list[4]['geometric'], 2)),''' & ''',np.round(superspread_list[4]['negative binomial'], 2),tuple(np.round(superspread_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(superspread_list[4]['zip'], 2),tuple(np.round(superspread_ci_list[4]['zip'], 2)),''' & ''',np.round(superspread_list[4]['beta-Poisson'], 2),tuple(np.round(superspread_ci_list[4]['beta-Poisson'], 2)),''' \\\\
@@ -199,7 +199,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(p0_list[0]['sample'], 2),''' & ''',np.round(p0_list[0]['poisson'], 2),tuple(np.round(p0_ci_list[0]['poisson'], 2)),''' & ''',np.round(p0_list[0]['geometric'], 2),tuple(np.round(p0_ci_list[0]['geometric'], 2)),''' & ''',np.round(p0_list[0]['negative binomial'], 2),tuple(np.round(p0_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(p0_list[0]['zip'], 2),tuple(np.round(p0_ci_list[0]['zip'], 2)),''' & ''',np.round(p0_list[0]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[0]['beta-Poisson'], 2)),''' \\\\
-		Monkeypox & ''',np.round(p0_list[1]['sample'], 2),''' & ''',np.round(p0_list[1]['poisson'], 2),tuple(np.round(p0_ci_list[1]['poisson'], 2)),''' & ''',np.round(p0_list[1]['geometric'], 2),tuple(np.round(p0_ci_list[1]['geometric'], 2)),''' & ''',np.round(p0_list[1]['negative binomial'], 2),tuple(np.round(p0_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(p0_list[1]['zip'], 2),tuple(np.round(p0_ci_list[1]['zip'], 2)),''' & ''',np.round(p0_list[1]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Mpox & ''',np.round(p0_list[1]['sample'], 2),''' & ''',np.round(p0_list[1]['poisson'], 2),tuple(np.round(p0_ci_list[1]['poisson'], 2)),''' & ''',np.round(p0_list[1]['geometric'], 2),tuple(np.round(p0_ci_list[1]['geometric'], 2)),''' & ''',np.round(p0_list[1]['negative binomial'], 2),tuple(np.round(p0_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(p0_list[1]['zip'], 2),tuple(np.round(p0_ci_list[1]['zip'], 2)),''' & ''',np.round(p0_list[1]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[1]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(p0_list[2]['sample'], 2),''' & ''',np.round(p0_list[2]['poisson'], 2),tuple(np.round(p0_ci_list[2]['poisson'], 2)),''' & ''',np.round(p0_list[2]['geometric'], 2),tuple(np.round(p0_ci_list[2]['geometric'], 2)),''' & ''',np.round(p0_list[2]['negative binomial'], 2),tuple(np.round(p0_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(p0_list[2]['zip'], 2),tuple(np.round(p0_ci_list[2]['zip'], 2)),''' & ''',np.round(p0_list[2]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[2]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(p0_list[3]['sample'], 2),''' & ''',np.round(p0_list[3]['poisson'], 2),tuple(np.round(p0_ci_list[3]['poisson'], 2)),''' & ''',np.round(p0_list[3]['geometric'], 2),tuple(np.round(p0_ci_list[3]['geometric'], 2)),''' & ''',np.round(p0_list[3]['negative binomial'], 2),tuple(np.round(p0_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(p0_list[3]['zip'], 2),tuple(np.round(p0_ci_list[3]['zip'], 2)),''' & ''',np.round(p0_list[3]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[3]['beta-Poisson'], 2)),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(p0_list[4]['sample'], 2),''' & ''',np.round(p0_list[4]['poisson'], 2),tuple(np.round(p0_ci_list[4]['poisson'], 2)),''' & ''',np.round(p0_list[4]['geometric'], 2),tuple(np.round(p0_ci_list[4]['geometric'], 2)),''' & ''',np.round(p0_list[4]['negative binomial'], 2),tuple(np.round(p0_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(p0_list[4]['zip'], 2),tuple(np.round(p0_ci_list[4]['zip'], 2)),''' & ''',np.round(p0_list[4]['beta-Poisson'], 2),tuple(np.round(p0_ci_list[4]['beta-Poisson'], 2)),''' \\\\
@@ -220,7 +220,7 @@ print('''
 		\\textbf{Dataset} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
     \midrule
 		Plague & ''',np.round(od_list[0]['sample'], 2),''' & ''',np.round(od_list[0]['geometric'], 2),tuple(np.round(od_ci_list[0]['geometric'], 2)),''' & ''',np.round(od_list[0]['negative binomial'], 2),tuple(np.round(od_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(od_list[0]['zip'], 2),tuple(np.round(od_ci_list[0]['zip'], 2)),''' & ''',np.round(od_list[0]['beta-Poisson'], 2),tuple(np.round(od_ci_list[0]['beta-Poisson'], 2)),''' \\\\
-		Monkeypox & ''',np.round(od_list[1]['sample'], 2),''' & ''',np.round(od_list[1]['geometric'], 2),tuple(np.round(od_ci_list[1]['geometric'], 2)),''' & ''',np.round(od_list[1]['negative binomial'], 2),tuple(np.round(od_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(od_list[1]['zip'], 2),tuple(np.round(od_ci_list[1]['zip'], 2)),''' & ''',np.round(od_list[1]['beta-Poisson'], 2),tuple(np.round(od_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Mpox & ''',np.round(od_list[1]['sample'], 2),''' & ''',np.round(od_list[1]['geometric'], 2),tuple(np.round(od_ci_list[1]['geometric'], 2)),''' & ''',np.round(od_list[1]['negative binomial'], 2),tuple(np.round(od_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(od_list[1]['zip'], 2),tuple(np.round(od_ci_list[1]['zip'], 2)),''' & ''',np.round(od_list[1]['beta-Poisson'], 2),tuple(np.round(od_ci_list[1]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Nigeria 2014 & ''',np.round(od_list[2]['sample'], 2),''' & ''',np.round(od_list[2]['geometric'], 2),tuple(np.round(od_ci_list[2]['geometric'], 2)),''' & ''',np.round(od_list[2]['negative binomial'], 2),tuple(np.round(od_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(od_list[2]['zip'], 2),tuple(np.round(od_ci_list[2]['zip'], 2)),''' & ''',np.round(od_list[2]['beta-Poisson'], 2),tuple(np.round(od_ci_list[2]['beta-Poisson'], 2)),''' \\\\
 		Ebola, Guinea 2014 & ''',np.round(od_list[3]['sample'], 2),''' & ''',np.round(od_list[3]['geometric'], 2),tuple(np.round(od_ci_list[3]['geometric'], 2)),''' & ''',np.round(od_list[3]['negative binomial'], 2),tuple(np.round(od_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(od_list[3]['zip'], 2),tuple(np.round(od_ci_list[3]['zip'], 2)),''' & ''',np.round(od_list[3]['beta-Poisson'], 2),tuple(np.round(od_ci_list[3]['beta-Poisson'], 2)),''' \\\\
 		SARS, Singapore 2003 & ''',np.round(od_list[4]['sample'], 2),''' & ''',np.round(od_list[4]['geometric'], 2),tuple(np.round(od_ci_list[4]['geometric'], 2)),''' & ''',np.round(od_list[4]['negative binomial'], 2),tuple(np.round(od_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(od_list[4]['zip'], 2),tuple(np.round(od_ci_list[4]['zip'], 2)),''' & ''',np.round(od_list[4]['beta-Poisson'], 2),tuple(np.round(od_ci_list[4]['beta-Poisson'], 2)),''' \\\\

@@ -3,29 +3,29 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import arange, array, ceil, floor, isnan, linspace, log10, where
 from pickle import load
 from scipy import stats
-from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from datasets import (plague_data, mpox_data, nigeria_ebola_data,
+    guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 
 formats = ['.png', '.svg', '.eps']
 
 data_name_list = [
     'plague_data',
-    'monkeypox_data',
-    'fasina_ebola_data',
-    'fay_ebola_data',
-    'cdc_sars_data',
-    'cowling_mers_data',
-    'mers_data',
+    'mpox_data',
+    'nigeria_ebola_data',
+    'guinea_ebola_data',
+    'singapore_sars_data',
+    'sk_mers_data',
+    'sa_mers_data',
     'noro_data'
     ]
 data_set_list = [
     plague_data,
-    monkeypox_data,
-    fasina_ebola_data,
-    fay_ebola_data,
-    cdc_sars_data,
-    cowling_mers_data,
-    mers_data,
+    mpox_data,
+    nigeria_ebola_data,
+    guinea_ebola_data,
+    singapore_sars_data,
+    sk_mers_data,
+    sa_mers_data,
     noro_data
     ]
 
@@ -34,10 +34,16 @@ for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname, 'rb') as f:
         (mle_dict,
-        var_dict,
-        ci_dict,
-        var_ci_dict,
-        llh_dict) = load(f)
+            var_dict,
+            od_dict,
+            superspread_dict,
+            p0_dict,
+            ci_dict,
+            var_ci_dict,
+            od_ci_dict,
+            superspread_ci_dict,
+            p0_ci_dict,
+            llh_dict) = load(f)
     mle_list.append(mle_dict)
 
 lmbd_vals_list = []
