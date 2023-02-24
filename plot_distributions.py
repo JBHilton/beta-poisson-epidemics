@@ -45,15 +45,19 @@ superspread_list = []
 superspread_ci_list = []
 p0_list = []
 p0_ci_list = []
+od_list = []
+od_ci_list = []
 for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
             var_dict,
+            od_dict,
             superspread_dict,
             p0_dict,
             ci_dict,
             var_ci_dict,
+            od_ci_dict,
             superspread_ci_dict,
             p0_ci_dict,
             llh_dict) = load(f)
@@ -63,6 +67,8 @@ for i, data_name in enumerate(data_name_list):
     superspread_ci_list.append(superspread_ci_dict)
     p0_list.append(p0_dict)
     p0_ci_list.append(p0_ci_dict)
+    od_list.append(od_dict)
+    od_ci_list.append(od_ci_dict)
 
 fig, axes = plt.subplots(4, 2, figsize=(12, 18))
 fig.tight_layout()
@@ -208,7 +214,7 @@ for i, p0_dict in enumerate(p0_list):
     # axes[i].axis([-0.5, 4.5, 0, .1])
     axes[i].set_ylim([0, 1])
     axes[i].set_aspect(7/1)
-    axes[i].set_ylabel('Superspreading\n proportion')
+    axes[i].set_ylabel('P[0]')
     axes[i].set_xticklabels(label_list, rotation=45, ha='right')
 
     # axes[i].text(-4, 1, figlabels[i],
@@ -219,6 +225,52 @@ for i, p0_dict in enumerate(p0_list):
 
 for fmt in formats:
     fig.savefig('plots/'+'p0_props'+fmt,bbox_inches='tight')
+
+fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
+fig.tight_layout()
+plt.subplots_adjust(hspace=0.3)
+axes = axes.flatten()
+
+for i, od_dict in enumerate(od_list):
+
+    od_ci_dict = od_ci_list[i]
+
+    label_list = ['Data',
+                  'Beta-\nPoisson',
+                  'Negative\nBinomial',
+                  'Geometric',
+                  'ZIP']
+    
+    key_list = ['sample',
+                'beta-Poisson',
+                'negative binomial',
+                'geometric',
+                'zip']
+    
+    bar_vals = np.array([
+        od_dict[key] for key in key_list
+    ])
+    bar_errs = np.vstack((np.array([0,0]),
+                         np.array([[od_dict[key] - od_ci_dict[key][0],  od_ci_dict[key][1] - od_dict[key]] for key in key_list[1:]]))
+    )
+
+    y_max = 5 * np.ceil((bar_vals + bar_errs[:, 1]).max()/5)
+
+    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
+    # axes[i].axis([-0.5, 4.5, 0, .1])
+    axes[i].set_ylim([0, y_max])
+    axes[i].set_aspect(6/y_max)
+    axes[i].set_ylabel('Overdispersion')
+    axes[i].set_xticklabels(label_list, rotation=45, ha='right')
+
+    # axes[i].text(-4, 1, figlabels[i],
+    #         fontsize=12,
+    #         verticalalignment='top',
+    #         fontfamily='serif',
+    #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+
+for fmt in formats:
+    fig.savefig('plots/'+'od_props'+fmt,bbox_inches='tight')
 
 # x = np.linspace(1e-2,1, 100)
 # y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)

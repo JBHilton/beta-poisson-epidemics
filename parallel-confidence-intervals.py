@@ -115,6 +115,13 @@ def main(no_of_workers,
     p0_samples = [r[3] for r in results]
     mle_dict = calculator.mle_dict
     var_dict = calculator.var_dict
+    od_dict = {
+        'sample' : (var(data_set) - mean(data_set))/mean(data_set),
+        'geometric' : (var_dict['geometric'] - mle_dict['geometric'])/ mle_dict['geometric'],
+        'negative binomial' : mle_dict['negative binomial'][1],
+        'zip' : (var_dict['zip'] - mle_dict['zip'][0]*(1-mle_dict['zip'][1]))/ (mle_dict['zip'][0] * (1-mle_dict['zip'][1])),
+        'beta-Poisson' : (var_dict['beta-Poisson'] - mle_dict['beta-Poisson'][0])/ mle_dict['beta-Poisson'][0]
+    }
     superspread_dict = calculator.superspread_dict
     p0_dict = calculator.p0_dict
 
@@ -205,6 +212,30 @@ def main(no_of_workers,
         'beta-Poisson' : beta_poi_var_ci
     }
 
+    geo_od_samples = (array([d['geometric'] for d in var_samples]) - array([d['geometric'] for d in dict_samples]))/ array([d['geometric'] for d in dict_samples])
+    geo_od_ci = ci_from_bootstrap_samples(geo_od_samples,
+                                           0,
+                                           confidence_level)
+    neg_bin_od_samples = array([d['negative binomial'][1] for d in dict_samples])
+    neg_bin_od_ci = ci_from_bootstrap_samples(neg_bin_od_samples,
+                                           0,
+                                           confidence_level)
+    zip_od_samples = (array([d['zip'] for d in var_samples]) - array([d['zip'][0]*(1-d['zip'][1]) for d in dict_samples]))/ array([d['zip'][0]*(1-d['zip'][1]) for d in dict_samples])
+    zip_od_ci = ci_from_bootstrap_samples(zip_od_samples,
+                                           0,
+                                           confidence_level)
+    beta_poi_od_samples = (array([d['beta-Poisson'] for d in var_samples]) - array([d['beta-Poisson'][0] for d in dict_samples]))/ array([d['beta-Poisson'][0] for d in dict_samples])
+    beta_poi_od_ci = ci_from_bootstrap_samples(beta_poi_od_samples,
+                                           0,
+                                           confidence_level)
+
+    od_ci_dict = {
+        'geometric' : geo_od_ci,
+        'negative binomial' : neg_bin_od_ci,
+        'zip' : zip_od_ci,
+        'beta-Poisson' : beta_poi_od_ci
+    }
+
     poisson_superspread_samples = array([d['poisson'] for d in superspread_samples])
     poisson_superspread_ci = ci_from_bootstrap_samples(poisson_superspread_samples,
                                            superspread_dict['poisson'],
@@ -273,10 +304,12 @@ def main(no_of_workers,
         dump(
             (mle_dict,
             var_dict,
+            od_dict,
             superspread_dict,
             p0_dict,
             ci_dict,
             var_ci_dict,
+            od_ci_dict,
             superspread_ci_dict,
             p0_ci_dict,
             llh_dict),
