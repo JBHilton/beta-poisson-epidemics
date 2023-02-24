@@ -942,7 +942,7 @@ def zip_mle_grid(data,lmbd_interval,sigma_interval,lmbd_points,sigma_points):
     lmbdgrid,sigmagrid=np.meshgrid(lmbd,sigma)
     llh=np.zeros(lmbdgrid.shape)
     for x in data:
-        llh=llh+zip_log_lh(x,lmbdgrid,sigmagrid)
+        llh=llh+zip_loglh(x,lmbdgrid,sigmagrid)
     mle_loc=np.unravel_index(np.argmax(llh),llh.shape)
     lmbdmle=lmbdgrid[mle_loc]
     sigmamle=sigmagrid[mle_loc]

@@ -39,6 +39,7 @@ p0_list = []
 p0_ci_list = []
 od_list = []
 od_ci_list = []
+llh_list = []
 for i, data_name in enumerate(data_name_list):
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
@@ -61,6 +62,7 @@ for i, data_name in enumerate(data_name_list):
     p0_ci_list.append(p0_ci_dict)
     od_list.append(od_dict)
     od_ci_list.append(od_ci_dict)
+    llh_list.append(llh_dict)
 
 print('''
 \\begin{table}[ht]
