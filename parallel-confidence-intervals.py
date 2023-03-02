@@ -36,7 +36,7 @@ class MLECalculator:
 
         # Define some ansatzes of parameter MLEs
         theta_0 = (sample_var / sample_mean) - 1
-        phi_0 = 1 / theta_0
+        phi_0 = 1
         N_0 = 10 * sample_mean
         zip_lmbd_0 = sample_mean
         sigma_0 = 0.5
@@ -102,6 +102,8 @@ def main(no_of_workers,
 
     data_set = data_dict[data_name]
 
+    print(data_set)
+
     results = []
     calculator = MLECalculator(data_set)
     params = arange(no_samples)
@@ -114,6 +116,7 @@ def main(no_of_workers,
     superspread_samples = [r[2] for r in results]
     p0_samples = [r[3] for r in results]
     mle_dict = calculator.mle_dict
+    print(mle_dict['beta-Poisson'])
     var_dict = calculator.var_dict
     od_dict = {
         'sample' : (var(data_set) - mean(data_set))/mean(data_set),

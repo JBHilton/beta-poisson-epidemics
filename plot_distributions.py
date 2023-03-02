@@ -224,7 +224,7 @@ for i, p0_dict in enumerate(p0_list):
     #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
-    fig.savefig('plots/'+'p0_props'+fmt,bbox_inches='tight')
+    fig.savefig('plots/'+'p0_bars'+fmt,bbox_inches='tight')
 
 fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
 fig.tight_layout()
@@ -270,7 +270,7 @@ for i, od_dict in enumerate(od_list):
     #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
-    fig.savefig('plots/'+'od_props'+fmt,bbox_inches='tight')
+    fig.savefig('plots/'+'od_bars'+fmt,bbox_inches='tight')
 
 # x = np.linspace(1e-2,1, 100)
 # y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)
