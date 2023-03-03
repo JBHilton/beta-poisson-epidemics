@@ -721,6 +721,7 @@ def generate_superspread_dict(data, mle_dict):
             1/mle_dict['beta-Poisson'][2]))
 
     superspread_dict = {
+        'boundary' : superspread_bd,
         'sample' : sample_prop,
         'poisson' : p_prop,
         'geometric' : g_prop,

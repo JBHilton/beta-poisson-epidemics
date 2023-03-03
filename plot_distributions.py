@@ -56,6 +56,7 @@ for i, data_name in enumerate(data_name_list):
             superspread_dict,
             p0_dict,
             ci_dict,
+            mean_ci_dict,
             var_ci_dict,
             od_ci_dict,
             superspread_ci_dict,

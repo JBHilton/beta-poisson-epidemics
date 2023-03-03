@@ -102,8 +102,6 @@ def main(no_of_workers,
 
     data_set = data_dict[data_name]
 
-    print(data_set)
-
     results = []
     calculator = MLECalculator(data_set)
     params = arange(no_samples)
@@ -116,7 +114,6 @@ def main(no_of_workers,
     superspread_samples = [r[2] for r in results]
     p0_samples = [r[3] for r in results]
     mle_dict = calculator.mle_dict
-    print(mle_dict['beta-Poisson'])
     var_dict = calculator.var_dict
     od_dict = {
         'sample' : (var(data_set) - mean(data_set))/mean(data_set),
@@ -159,6 +156,11 @@ def main(no_of_workers,
     zip_sigma_ci = ci_from_bootstrap_samples(zip_sigma_samples,
                                             mle_dict['zip'][1],
                                             confidence_level)
+    zip_mean_samples = array(
+                            [d['zip'][0]*(1-d['zip'][1]) for d in dict_samples])
+    zip_mean_ci = ci_from_bootstrap_samples(zip_mean_samples,
+                                            mle_dict['zip'][1],
+                                            confidence_level)
 
     beta_poi_lmbd_samples = array(
                             [d['beta-Poisson'][0] for d in dict_samples])
@@ -184,6 +186,14 @@ def main(no_of_workers,
         'beta-Poisson' : [beta_poi_lmbd_ci,
                           beta_poi_phi_ci,
                           beta_poi_nu_ci]
+    }
+
+    mean_ci_dict = {
+        'poisson' : poisson_ci,
+        'geometric' : geo_ci,
+        'negative binomial' : neg_bin_lmbd_ci,
+        'zip' : zip_mean_ci,
+        'beta-Poisson' : beta_poi_lmbd_ci
     }
 
     poisson_var_samples = array([d['poisson'] for d in var_samples])
@@ -311,6 +321,7 @@ def main(no_of_workers,
             superspread_dict,
             p0_dict,
             ci_dict,
+            mean_ci_dict,
             var_ci_dict,
             od_ci_dict,
             superspread_ci_dict,
