@@ -34,6 +34,8 @@ data_set_list = [
 mle_list = []
 ci_list = []
 mean_ci_list = []
+var_list = []
+var_ci_list = []
 superspread_list = []
 superspread_ci_list = []
 p0_list = []
@@ -59,6 +61,8 @@ for i, data_name in enumerate(data_name_list):
     mle_list.append(mle_dict)
     ci_list.append(ci_dict)
     mean_ci_list.append(mean_ci_dict)
+    var_list.append(var_dict)
+    var_ci_list.append(var_ci_dict)
     superspread_list.append(superspread_dict)
     superspread_ci_list.append(superspread_ci_dict)
     p0_list.append(p0_dict)
@@ -112,6 +116,27 @@ print('''
 print('''
 \\begin{table}[ht]
 	\centering
+	\\begin{tabular}{lccccc}
+		\\hline
+		\\textbf{Dataset} & \\textbf{Observed} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} & \\textbf{Beta-Poisson} \\\\
+    \hline
+		Plague & ''',np.round(var_list[0]['sample'], 2),''' & ''',np.round(var_list[0]['geometric'], 2),tuple(np.round(var_ci_list[0]['geometric'], 2)),''' & ''',np.round(var_list[0]['negative binomial'], 2),tuple(np.round(var_ci_list[0]['negative binomial'], 2)),''' & ''',np.round(var_list[0]['zip'], 2),tuple(np.round(var_ci_list[0]['zip'], 2)),''' & ''',np.round(var_list[0]['beta-Poisson'], 2),tuple(np.round(var_ci_list[0]['beta-Poisson'], 2)),''' \\\\
+		Mpox & ''',np.round(var_list[1]['sample'], 2),''' & ''',np.round(var_list[1]['geometric'], 2),tuple(np.round(var_ci_list[1]['geometric'], 2)),''' & ''',np.round(var_list[1]['negative binomial'], 2),tuple(np.round(var_ci_list[1]['negative binomial'], 2)),''' & ''',np.round(var_list[1]['zip'], 2),tuple(np.round(var_ci_list[1]['zip'], 2)),''' & ''',np.round(var_list[1]['beta-Poisson'], 2),tuple(np.round(var_ci_list[1]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Nigeria 2014 & ''',np.round(var_list[2]['sample'], 2),''' & ''',np.round(var_list[2]['geometric'], 2),tuple(np.round(var_ci_list[2]['geometric'], 2)),''' & ''',np.round(var_list[2]['negative binomial'], 2),tuple(np.round(var_ci_list[2]['negative binomial'], 2)),''' & ''',np.round(var_list[2]['zip'], 2),tuple(np.round(var_ci_list[2]['zip'], 2)),''' & ''',np.round(var_list[2]['beta-Poisson'], 2),tuple(np.round(var_ci_list[2]['beta-Poisson'], 2)),''' \\\\
+		Ebola, Guinea 2014 & ''',np.round(var_list[3]['sample'], 2),''' & ''',np.round(var_list[3]['geometric'], 2),tuple(np.round(var_ci_list[3]['geometric'], 2)),''' & ''',np.round(var_list[3]['negative binomial'], 2),tuple(np.round(var_ci_list[3]['negative binomial'], 2)),''' & ''',np.round(var_list[3]['zip'], 2),tuple(np.round(var_ci_list[3]['zip'], 2)),''' & ''',np.round(var_list[3]['beta-Poisson'], 2),tuple(np.round(var_ci_list[3]['beta-Poisson'], 2)),''' \\\\
+		SARS, Singapore 2003 & ''',np.round(var_list[4]['sample'], 2),''' & ''',np.round(var_list[4]['geometric'], 2),tuple(np.round(var_ci_list[4]['geometric'], 2)),''' & ''',np.round(var_list[4]['negative binomial'], 2),tuple(np.round(var_ci_list[4]['negative binomial'], 2)),''' & ''',np.round(var_list[4]['zip'], 2),tuple(np.round(var_ci_list[4]['zip'], 2)),''' & ''',np.round(var_list[4]['beta-Poisson'], 2),tuple(np.round(var_ci_list[4]['beta-Poisson'], 2)),''' \\\\
+		MERS, South Korea 2015 & ''',np.round(var_list[5]['sample'], 2),''' & ''',np.round(var_list[5]['geometric'], 2),tuple(np.round(var_ci_list[5]['geometric'], 2)),''' & ''',np.round(var_list[5]['negative binomial'], 2),tuple(np.round(var_ci_list[5]['negative binomial'], 2)),''' & ''',np.round(var_list[5]['zip'], 2),tuple(np.round(var_ci_list[5]['zip'], 2)),''' & ''',np.round(var_list[5]['beta-Poisson'], 2),tuple(np.round(var_ci_list[5]['beta-Poisson'], 2)),''' \\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(var_list[6]['sample'], 2),''' & ''',np.round(var_list[6]['geometric'], 2),tuple(np.round(var_ci_list[6]['geometric'], 2)),''' & ''',np.round(var_list[6]['negative binomial'], 2),tuple(np.round(var_ci_list[6]['negative binomial'], 2)),''' & ''',np.round(var_list[6]['zip'], 2),tuple(np.round(var_ci_list[6]['zip'], 2)),''' & ''',np.round(var_list[6]['beta-Poisson'], 2),tuple(np.round(var_ci_list[6]['beta-Poisson'], 2)),''' \\\\
+		Norovirus, Netherlands 2012 & ''',np.round(var_list[7]['sample'], 2),''' & ''',np.round(var_list[7]['geometric'], 2),tuple(np.round(var_ci_list[7]['geometric'], 2)),''' & ''',np.round(var_list[7]['negative binomial'], 2),tuple(np.round(var_ci_list[7]['negative binomial'], 2)),''' & ''',np.round(var_list[7]['zip'], 2),tuple(np.round(var_ci_list[7]['zip'], 2)),''' & ''',np.round(var_list[7]['beta-Poisson'], 2),tuple(np.round(var_ci_list[7]['beta-Poisson'], 2)),''' \\\\
+    \\hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates for variance of each maximum likelihood distribution, 95\\% confidence intervals in parentheses. The Poisson distribution is omitted since the MLE's and confidence intervals are identical to those of the mean.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
 	\\begin{tabular}{lcccccc}
 		\\hline
 		\\textbf{Dataset} & \\textbf{Sample mean} $\\lambda$ & \\textbf{Neg. bin. } $\\theta$ & \\textbf{ZIP} $\\tilde{\lambda}$ & \\textbf{ZIP} $\sigma$ & \\textbf{Beta-Poisson} $\Phi$ & \\textbf{Beta-Poisson} $N$ \\
@@ -127,6 +152,27 @@ print('''
 	\\hline
 	\end{tabular}
 	\caption{Maximum likelihood estimates and confidence intervals (in parentheses) for model parameters given each dataset.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\hline
+		\\textbf{Dataset} & $\\lambda$ & $\\Phi$ & $\\nu$ \\\\
+    \hline
+		Plague & ''',np.round(mle_list[0]['beta-Poisson'][0], 2),tuple(np.round(ci_list[0]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[0]['beta-Poisson'][1], 2),tuple(np.round(ci_list[0]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[0]['beta-Poisson'][2], 2),tuple(np.round(ci_list[0]['beta-Poisson'][2], 2)),'''\\\\
+		Mpox & ''',np.round(mle_list[1]['beta-Poisson'][0], 2),tuple(np.round(ci_list[1]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][1], 2),tuple(np.round(ci_list[1]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[1]['beta-Poisson'][2], 2),tuple(np.round(ci_list[1]['beta-Poisson'][2], 2)),'''\\\\
+		Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['beta-Poisson'][0], 2),tuple(np.round(ci_list[2]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[2]['beta-Poisson'][1], 2),tuple(np.round(ci_list[2]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[2]['beta-Poisson'][2], 2),tuple(np.round(ci_list[2]['beta-Poisson'][2], 2)),'''\\\\
+		Ebola, Guinea 2014 & ''',np.round(mle_list[3]['beta-Poisson'][0], 2),tuple(np.round(ci_list[3]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[3]['beta-Poisson'][1], 2),tuple(np.round(ci_list[3]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[3]['beta-Poisson'][2], 2),tuple(np.round(ci_list[3]['beta-Poisson'][2], 2)),'''\\\\
+		SARS, Singapore 2003 & ''',np.round(mle_list[4]['beta-Poisson'][0], 2),tuple(np.round(ci_list[4]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[4]['beta-Poisson'][1], 2),tuple(np.round(ci_list[4]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[4]['beta-Poisson'][2], 2),tuple(np.round(ci_list[4]['beta-Poisson'][2], 2)),'''\\\\
+		MERS, South Korea 2015 & ''',np.round(mle_list[5]['beta-Poisson'][0], 2),tuple(np.round(ci_list[5]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[5]['beta-Poisson'][1], 2),tuple(np.round(ci_list[5]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[5]['beta-Poisson'][2], 2),tuple(np.round(ci_list[5]['beta-Poisson'][2], 2)),'''\\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(mle_list[6]['beta-Poisson'][0], 2),tuple(np.round(ci_list[6]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[6]['beta-Poisson'][1], 2),tuple(np.round(ci_list[6]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[6]['beta-Poisson'][2], 2),tuple(np.round(ci_list[6]['beta-Poisson'][2], 2)),'''\\\\
+		Norovirus, Netherlands 2012 & ''',np.round(mle_list[7]['beta-Poisson'][0], 2),tuple(np.round(ci_list[7]['beta-Poisson'][0], 2)),''' & ''',np.round(mle_list[7]['beta-Poisson'][1], 2),tuple(np.round(ci_list[7]['beta-Poisson'][1], 2)),''' & ''',np.round(mle_list[7]['beta-Poisson'][2], 2),tuple(np.round(ci_list[7]['beta-Poisson'][2], 2)),'''\\\\
+	\\hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates of beta-Poisson model parameters by dataset, 95\\% confidence intervals in parentheses.}
 \end{table}
 ''')
 
