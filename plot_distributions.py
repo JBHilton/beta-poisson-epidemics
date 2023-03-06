@@ -8,6 +8,8 @@ from datasets import (plague_data, mpox_data, nigeria_ebola_data,
     guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
 
+plt.rcParams.update({'font.size': 16})
+
 formats = ['.png', '.svg', '.eps']
 
 data_key_list = [
@@ -81,9 +83,9 @@ for i, data_key_list in enumerate(data_key_list):
     od_list.append(od_dict)
     od_ci_list.append(od_ci_dict)
 
-label_list = ['$\\lambda$',
-                '$\\Phi$',
-                '$\\nu$']
+label_list = ['$\\hat{\\lambda}$',
+                '$\\hat{\\Phi}$',
+                '$\\hat{\\nu}$']
 
 fig, axes = plt.subplots(1, 3, figsize=(20, 5))
 fig.tight_layout()
@@ -96,23 +98,42 @@ for idx in range(3):
     ])
     bar_errs = np.array([[mle_list[i]['beta-Poisson'][idx] - ci_list[i]['beta-Poisson'][idx][0], 
                           ci_list[i]['beta-Poisson'][idx][1] - mle_list[i]['beta-Poisson'][idx]] for i in range(len(mle_list))])
-    print(bar_errs)
 
-    axes[idx].bar(data_name_list, bar_vals, yerr=bar_errs.T)
-    # axes[i].axis([-0.5, 4.5, 0, .1])
-    # axes[i].set_ylim([0, 1])
-    # axes[i].set_aspect(7/1)
-    axes[idx].set_ylabel(label_list[idx])
+    axes[idx].bar(data_name_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
+    axes[idx].set_ylabel(label_list[idx], rotation=0, labelpad=20)
     axes[idx].set_xticklabels(data_name_list, rotation=45, ha='right')
 
 axes[1].set_yscale('log')
 axes[2].set_yscale('log')
+axes[0].set_ylim([0, 2.5])
+axes[0].set_aspect(8 / 2.5)
+axes[1].set_ylim([1e-7, 20])
+axes[1].set_aspect(8 / (np.log10(20)+7))
+axes[2].set_ylim([1e-5, 20])
+axes[2].set_aspect(8 / (np.log10(20)+5))
+
+axes[0].text(-3, 2.5, 'a)',
+        fontsize=16,
+        verticalalignment='top',
+        fontfamily='serif',
+        bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+axes[1].text(-3, 20, 'b)',
+        fontsize=16,
+        verticalalignment='top',
+        fontfamily='serif',
+        bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+axes[2].text(-3, 20, 'c)',
+        fontsize=16,
+        verticalalignment='top',
+        fontfamily='serif',
+        bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
     fig.savefig('plots/'+'bp_mles'+fmt,bbox_inches='tight')
 
-fig, axes = plt.subplots(4, 2, figsize=(12, 18))
+fig, axes = plt.subplots(4, 2, figsize=(15, 35))
 fig.tight_layout()
+plt.subplots_adjust(wspace=0.3)
 axes = axes.flatten()
 
 for i, mle_dict in enumerate(mle_list):
@@ -163,21 +184,21 @@ for i, mle_dict in enumerate(mle_list):
 
     axes[i].set_xlabel('Secondary cases')
     axes[i].set_ylabel('Probability')
+    axes[i].set_title(data_name_list[i])
 
-    axes[i].text(-4, 1, figlabels[i],
-            fontsize=12,
+    axes[i].text(-2, 1, figlabels[i],
             verticalalignment='top',
             fontfamily='serif',
             bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
-axes[0].legend(loc='center left', bbox_to_anchor=(3., 0.5))
+axes[0].legend(loc='center left', bbox_to_anchor=(2.4, 0.5))
 
 for fmt in formats:
     fig.savefig('plots/'+'fitted_distributions'+fmt,bbox_inches='tight')
 
-fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
+fig, axes = plt.subplots(4, 2, figsize=(15, 30))
 fig.tight_layout()
-plt.subplots_adjust(hspace=0.3)
+plt.subplots_adjust(hspace=.3)
 axes = axes.flatten()
 
 for i, superspread_dict in enumerate(superspread_list):
@@ -205,23 +226,23 @@ for i, superspread_dict in enumerate(superspread_list):
                          np.array([[superspread_dict[key] - superspread_ci_dict[key][0],  superspread_ci_dict[key][1] - superspread_dict[key]] for key in key_list[1:]]))
     )
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
+    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
     # axes[i].axis([-0.5, 4.5, 0, .1])
     axes[i].set_ylim([0, 0.18])
     axes[i].set_aspect(7/.18)
     axes[i].set_ylabel('Superspreading\n proportion')
     axes[i].set_xticklabels(label_list, rotation=45, ha='right')
+    axes[i].set_title(data_name_list[i])
 
-    # axes[i].text(-4, 1, figlabels[i],
-    #         fontsize=12,
-    #         verticalalignment='top',
-    #         fontfamily='serif',
-    #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+    axes[i].text(-2, .18, figlabels[i],
+            verticalalignment='top',
+            fontfamily='serif',
+            bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
     fig.savefig('plots/'+'superspread_props'+fmt,bbox_inches='tight')
 
-fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
+fig, axes = plt.subplots(4, 2, figsize=(15, 30))
 fig.tight_layout()
 plt.subplots_adjust(hspace=0.3)
 axes = axes.flatten()
@@ -251,25 +272,25 @@ for i, p0_dict in enumerate(p0_list):
                          np.array([[p0_dict[key] - p0_ci_dict[key][0],  p0_ci_dict[key][1] - p0_dict[key]] for key in key_list[1:]]))
     )
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
+    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
     # axes[i].axis([-0.5, 4.5, 0, .1])
     axes[i].set_ylim([0, 1])
     axes[i].set_aspect(7/1)
     axes[i].set_ylabel('P[0]')
     axes[i].set_xticklabels(label_list, rotation=45, ha='right')
+    axes[i].set_title(data_name_list[i])
 
-    # axes[i].text(-4, 1, figlabels[i],
-    #         fontsize=12,
-    #         verticalalignment='top',
-    #         fontfamily='serif',
-    #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+    axes[i].text(-2, 1, figlabels[i],
+            verticalalignment='top',
+            fontfamily='serif',
+            bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
     fig.savefig('plots/'+'p0_bars'+fmt,bbox_inches='tight')
 
-fig, axes = plt.subplots(4, 2, figsize=(7.5, 15))
+fig, axes = plt.subplots(4, 2, figsize=(15, 30))
 fig.tight_layout()
-plt.subplots_adjust(hspace=0.3)
+plt.subplots_adjust(hspace=.3)
 axes = axes.flatten()
 
 for i, od_dict in enumerate(od_list):
@@ -297,18 +318,17 @@ for i, od_dict in enumerate(od_list):
 
     y_max = 5 * np.ceil((bar_vals + bar_errs[:, 1]).max()/5)
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T)
-    # axes[i].axis([-0.5, 4.5, 0, .1])
+    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
     axes[i].set_ylim([0, y_max])
     axes[i].set_aspect(6/y_max)
     axes[i].set_ylabel('Overdispersion')
     axes[i].set_xticklabels(label_list, rotation=45, ha='right')
+    axes[i].set_title(data_name_list[i])
 
-    # axes[i].text(-4, 1, figlabels[i],
-    #         fontsize=12,
-    #         verticalalignment='top',
-    #         fontfamily='serif',
-    #         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+    axes[i].text(-2, y_max, figlabels[i],
+            verticalalignment='top',
+            fontfamily='serif',
+            bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
 
 for fmt in formats:
     fig.savefig('plots/'+'od_bars'+fmt,bbox_inches='tight')
