@@ -70,6 +70,29 @@ for i, data_name in enumerate(data_name_list):
     od_list.append(od_dict)
     od_ci_list.append(od_ci_dict)
     llh_list.append(llh_dict)
+    
+unique_offspring_vals = np.unique(np.hstack(data_set_list))
+
+table_str = '''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{l|c|c|c|c|c|c|c|c}
+		\\hline
+		\\ & \\textbf{Plague} & \\textbf{Mpox} & \\textbf{Ebola,\n Nigeria 2014} & \\textbf{Ebola,\n Guinea 2014} & \\textbf{SARS,\n Singapore 2003} & \\textbf{MERS,\n South Korea 2015} & \\textbf{MERS,\n Saudi Arabia 2015} & \\textbf{Norovirus,\n Netherlands 2012} \\\\
+'''
+for v in unique_offspring_vals:
+    table_str += (''' \\hline ''' + str(v))
+    for ds in data_set_list:
+        table_str += (''' & ''' + str(ds.count(v)))
+    table_str += '''\\\\\n'''
+table_str += '''
+    \\hline
+	\end{tabular}
+	\caption{Frequency of secondary case numbers by dataset.}
+\end{table}
+'''
+
+print(table_str)
 
 print('''
 \\begin{table}[ht]
@@ -244,18 +267,18 @@ print('''
 print('''
 \\begin{table}[ht]
 	\centering
-	\\begin{tabular}{lcccccc}
+	\\begin{tabular}{lcccc}
 		\\hline
-		\\textbf{Dataset} & \\textbf{Neg. bin. } & \\textbf{ZIP} \\\\
+		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} \\\\
     \hline
-		Plague & ''',np.round(np.exp(llh_list[0]['negative binomial'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[0]['zip'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' \\\\
-		Mpox & ''',np.round(np.exp(llh_list[1]['negative binomial'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['zip'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' \\\\
-		Ebola, Nigeria 2014 & ''',np.round(np.exp(llh_list[2]['negative binomial'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[2]['zip'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' \\\\
-		Ebola, Guinea 2014 & ''',np.round(np.exp(llh_list[3]['negative binomial'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[3]['zip'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' \\\\
-		SARS, Singapore 2003 & ''',np.round(np.exp(llh_list[4]['negative binomial'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[4]['zip'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' \\\\
-		MERS, South Korea 2015 & ''',np.round(np.exp(llh_list[5]['negative binomial'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[5]['zip'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' \\\\
-		MERS, Saudi Arabia 2015 & ''',np.round(np.exp(llh_list[6]['negative binomial'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[6]['zip'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' \\\\
-		Norovirus, Netherlands 2012 & ''',np.round(np.exp(llh_list[7]['negative binomial'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[7]['zip'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' \\\\
+		Plague & ''',np.round(np.exp(llh_list[0]['poisson'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[0]['geometric'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[0]['negative binomial'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[0]['zip'][0]-llh_list[0]['beta-Poisson'][0]), 2),''' \\\\
+		Mpox & ''',np.round(np.exp(llh_list[1]['poisson'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['geometric'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['negative binomial'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[1]['zip'][0]-llh_list[1]['beta-Poisson'][0]), 2),''' \\\\
+		Ebola, Nigeria 2014 & ''',np.round(np.exp(llh_list[2]['poisson'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[2]['geometric'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[2]['negative binomial'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[2]['zip'][0]-llh_list[2]['beta-Poisson'][0]), 2),''' \\\\
+		Ebola, Guinea 2014 & ''',np.round(np.exp(llh_list[3]['poisson'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[3]['geometric'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[3]['negative binomial'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[3]['zip'][0]-llh_list[3]['beta-Poisson'][0]), 2),''' \\\\
+		SARS, Singapore 2003 & ''',np.round(np.exp(llh_list[4]['poisson'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[4]['geometric'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[4]['negative binomial'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[4]['zip'][0]-llh_list[4]['beta-Poisson'][0]), 2),''' \\\\
+		MERS, South Korea 2015 & ''',np.round(np.exp(llh_list[5]['poisson'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[5]['geometric'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[5]['negative binomial'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[5]['zip'][0]-llh_list[5]['beta-Poisson'][0]), 2),''' \\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(np.exp(llh_list[6]['poisson'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[6]['geometric'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[6]['negative binomial'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[6]['zip'][0]-llh_list[6]['beta-Poisson'][0]), 2),''' \\\\
+		Norovirus, Netherlands 2012 & ''',np.round(np.exp(llh_list[7]['poisson'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[7]['geometric'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[7]['negative binomial'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' & ''',np.round(np.exp(llh_list[7]['zip'][0]-llh_list[7]['beta-Poisson'][0]), 2),''' \\\\
 	\\hline
 	\end{tabular}
 	\caption{Likelihood ratios of beta-Poisson to negative binomial and ZIP models under each dataset.}
