@@ -144,8 +144,6 @@ for i, mle_dict in enumerate(mle_list):
     counts,bins=np.histogram(data_set_list[i],no_vals)
     dist=counts/len(data_set_list[i])
     if max(data_set_list[i])>xMax:
-        print(max(data_set_list[i]))
-        print(xMax)
         dist_pos=np.where(dist[:xMax+1]>0)[0]
     else:
         dist_pos=np.where(dist>0)[0]
@@ -332,16 +330,3 @@ for i, od_dict in enumerate(od_list):
 
 for fmt in formats:
     fig.savefig('plots/'+'od_bars'+fmt,bbox_inches='tight')
-
-# x = np.linspace(1e-2,1, 100)
-# y = stats.beta.pdf(x, np.mean(mle_list[i][i])*phi_mle, (1/N_inv_mle-np.mean(mle_list[i][i]))*phi_mle)
-# fig,ax=plt.subplots(figsize=(5,5))
-# plt.plot(x, y,'r-', lw=3, alpha=0.6, label='beta pdf')
-# axes[i].axis([-0.01,1.01,0,1.01*np.max(y)])
-# axes[i].set_aspect(1.02/(1.01*np.max(y)))
-# plt.xlabel('Transmission probability')
-# plt.ylabel('PDF')
-# plt.xticks()
-# plt.yticks()
-# plt.title('Beta distribution underlying Gani and Leach data')
-# fig.savefig('plots/'+'plague_beta_dist.png',format='png',bbox_inches='tight')

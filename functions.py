@@ -712,7 +712,7 @@ def generate_superspread_dict(data, mle_dict):
         1/(mle_dict['negative binomial'][1]+1)).cdf(superspread_bd)
     zip_prop = 1 - np.sum(zip_pmf(np.arange(superspread_bd + 1), mle_dict['zip'][0],mle_dict['zip'][1]))
 
-    if mle_dict['beta-Poisson'][2] < 1e-2:
+    if mle_dict['beta-Poisson'][2] < 5e-2:
         bp_prop = nb_prop
     else:
         bp_prop = 1 - np.sum(beta_poisson_pmf(np.arange(superspread_bd + 1),
@@ -754,7 +754,7 @@ def generate_p0_dict(data, mle_dict):
     nb_p0 = stats.nbinom(mle_dict['negative binomial'][0]/mle_dict['negative binomial'][1],
             1/(mle_dict['negative binomial'][1]+1)).pmf(0)
 
-    if mle_dict['beta-Poisson'][2] < 1e-2:
+    if mle_dict['beta-Poisson'][2] < 5e-2:
         bp_p0 = nb_p0
     else:
         bp_p0 = beta_poisson_pmf(0,

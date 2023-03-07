@@ -12,6 +12,8 @@ from datasets import (plague_data, mpox_data, nigeria_ebola_data,
 from functions import (ci_from_bootstrap_samples, generate_llh_dict,
     generate_mle_dict, generate_p0_dict, generate_superspread_dict, generate_var_dict)
 
+MAX_SAMPLE_ATTEMPTS = 100
+
 data_dict = {
     'plague_data' : plague_data,
     'mpox_data' : mpox_data,
@@ -57,15 +59,18 @@ class MLECalculator:
         self.sample_size = size(data_set)
 
     def __call__(self, p):
-        try:
-            results = self._resample_and_fit(p)
-        except ValueError as err:
-            print(
-                'Exception raised for parameters={0}\n\tException: {1}'.format(
-                p, err)
-                )
-            return 0.0
-        return results
+        flag=1
+        n_attempts = 0
+        while flag:
+            try:
+                results = self._resample_and_fit(p)
+                flag=0
+                return results
+            except:
+                n_attempts += 1
+                if n_attempts >= MAX_SAMPLE_ATTEMPTS:
+                    print('Failed to generate successful bootstrap sample, returning 0.0 on this attempt.')
+                    return 0.0
 
     def _resample_and_fit(self, p):
         sample_flag = 0
