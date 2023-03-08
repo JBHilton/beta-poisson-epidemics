@@ -78,13 +78,17 @@ table_str = '''
 	\centering
 	\\begin{tabular}{l|c|c|c|c|c|c|c|c}
 		\\hline
-		\\ & \\textbf{Plague} & \\textbf{Mpox} & \\textbf{Ebola,\n Nigeria 2014} & \\textbf{Ebola,\n Guinea 2014} & \\textbf{SARS,\n Singapore 2003} & \\textbf{MERS,\n South Korea 2015} & \\textbf{MERS,\n Saudi Arabia 2015} & \\textbf{Norovirus,\n Netherlands 2012} \\\\
+		\\ & \\textbf{Plague} & \\textbf{Mpox} & \\textbf{Ebola, Nigeria 2014} & \\textbf{Ebola, Guinea 2014} & \\textbf{SARS, Singapore 2003} & \\textbf{MERS, South Korea 2015} & \\textbf{MERS, Saudi Arabia 2015} & \\textbf{Norovirus, Netherlands 2012} \\\\
 '''
 for v in unique_offspring_vals:
     table_str += (''' \\hline ''' + str(v))
     for ds in data_set_list:
         table_str += (''' & ''' + str(ds.count(v)))
     table_str += '''\\\\\n'''
+table_str += (''' \\hline Total''')
+for ds in data_set_list:
+        table_str += (''' & ''' + str(sum(ds)))
+table_str += '''\\\\\n'''
 table_str += '''
     \\hline
 	\end{tabular}
