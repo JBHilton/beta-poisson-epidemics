@@ -82,8 +82,12 @@ table_str = '''
 '''
 for v in unique_offspring_vals:
     table_str += (''' \\hline ''' + str(v))
-    for ds in data_set_list:
-        table_str += (''' & ''' + str(ds.count(v)))
+    for i in range(len(data_set_list)):
+        ds = data_set_list[i]
+        if v==superspread_list[i]['boundary']:
+        	table_str += (''' & \\textbf{''' + str(ds.count(v)) + '''}''')
+		else:
+            table_str += (''' & ''' + str(ds.count(v)))
     table_str += '''\\\\\n'''
 table_str += (''' \\hline Total''')
 for ds in data_set_list:
@@ -200,6 +204,90 @@ print('''
 	\\hline
 	\end{tabular}
 	\caption{Maximum likelihood estimates of beta-Poisson model parameters by dataset, 95\\% confidence intervals in parentheses.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\hline
+		\\textbf{Dataset} & $\\lambda$ $ \\\\
+    \hline
+		Plague & ''',np.round(mle_list[0]['poisson'], 2),tuple(np.round(ci_list[0]['poisson'], 2)),'''\\\\
+		Mpox & ''',np.round(mle_list[1]['poisson'], 2),tuple(np.round(ci_list[1]['poisson'], 2)),'''\\\\
+		Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['poisson'], 2),tuple(np.round(ci_list[2]['poisson'], 2)),'''\\\\
+		Ebola, Guinea 2014 & ''',np.round(mle_list[3]['poisson'], 2),tuple(np.round(ci_list[3]['poisson'], 2)),'''\\\\
+		SARS, Singapore 2003 & ''',np.round(mle_list[4]['poisson'], 2),tuple(np.round(ci_list[4]['poisson'], 2)),'''\\\\
+		MERS, South Korea 2015 & ''',np.round(mle_list[5]['poisson'], 2),tuple(np.round(ci_list[5]['poisson'], 2)),'''\\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(mle_list[6]['poisson'], 2),tuple(np.round(ci_list[6]['poisson'], 2)),'''\\\\
+		Norovirus, Netherlands 2012 & ''',np.round(mle_list[7]['poisson'], 2),tuple(np.round(ci_list[7]['poisson'], 2)),'''\\\\
+	\\hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates of Poisson model parameters by dataset, 95\\% confidence intervals in parentheses.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\hline
+		\\textbf{Dataset} & $\\lambda$ $ \\\\
+    \hline
+		Plague & ''',np.round(mle_list[0]['geometric'], 2),tuple(np.round(ci_list[0]['geometric'], 2)),'''\\\\
+		Mpox & ''',np.round(mle_list[1]['geometric'], 2),tuple(np.round(ci_list[1]['geometric'], 2)),'''\\\\
+		Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['geometric'], 2),tuple(np.round(ci_list[2]['geometric'], 2)),'''\\\\
+		Ebola, Guinea 2014 & ''',np.round(mle_list[3]['geometric'], 2),tuple(np.round(ci_list[3]['geometric'], 2)),'''\\\\
+		SARS, Singapore 2003 & ''',np.round(mle_list[4]['geometric'], 2),tuple(np.round(ci_list[4]['geometric'], 2)),'''\\\\
+		MERS, South Korea 2015 & ''',np.round(mle_list[5]['geometric'], 2),tuple(np.round(ci_list[5]['geometric'], 2)),'''\\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(mle_list[6]['geometric'], 2),tuple(np.round(ci_list[6]['geometric'], 2)),'''\\\\
+		Norovirus, Netherlands 2012 & ''',np.round(mle_list[7]['geometric'], 2),tuple(np.round(ci_list[7]['geometric'], 2)),'''\\\\
+	\\hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates of geometric model parameters by dataset, 95\\% confidence intervals in parentheses.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\hline
+		\\textbf{Dataset} & $\\lambda$ & $\\theta$ \\\\
+    \hline
+		Plague & ''',np.round(mle_list[0]['negative binomial'][0], 2),tuple(np.round(ci_list[0]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[0]['negative binomial'][1], 2),tuple(np.round(ci_list[0]['negative binomial'][1], 2)),'''\\\\
+        Mpox & ''',np.round(mle_list[1]['negative binomial'][0], 2),tuple(np.round(ci_list[1]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[1]['negative binomial'][1], 2),tuple(np.round(ci_list[1]['negative binomial'][1], 2)),'''\\\\
+        Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['negative binomial'][0], 2),tuple(np.round(ci_list[2]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[2]['negative binomial'][1], 2),tuple(np.round(ci_list[2]['negative binomial'][1], 2)),'''\\\\
+        Ebola, Guinea 2014 & ''',np.round(mle_list[3]['negative binomial'][0], 2),tuple(np.round(ci_list[3]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[3]['negative binomial'][1], 2),tuple(np.round(ci_list[3]['negative binomial'][1], 2)),'''\\\\
+        SARS, Singapore 2003 & ''',np.round(mle_list[4]['negative binomial'][0], 2),tuple(np.round(ci_list[4]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[4]['negative binomial'][1], 2),tuple(np.round(ci_list[4]['negative binomial'][1], 2)),'''\\\\
+        MERS, South Korea 2015 & ''',np.round(mle_list[5]['negative binomial'][0], 2),tuple(np.round(ci_list[5]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[5]['negative binomial'][1], 2),tuple(np.round(ci_list[5]['negative binomial'][1], 2)),'''\\\\
+        MERS, Saudi Arabia 2015 & ''',np.round(mle_list[6]['negative binomial'][0], 2),tuple(np.round(ci_list[6]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[6]['negative binomial'][1], 2),tuple(np.round(ci_list[6]['negative binomial'][1], 2)),'''\\\\
+        Norovirus, Netherlands 2012 & ''',np.round(mle_list[7]['negative binomial'][0], 2),tuple(np.round(ci_list[7]['negative binomial'][0], 2)),''' & ''',np.round(mle_list[7]['negative binomial'][1], 2),tuple(np.round(ci_list[7]['negative binomial'][1], 2)),'''\\\\
+    \hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates of negative binomial model parameters by dataset, 95\\% confidence intervals in parentheses.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccccc}
+		\\hline
+		\\textbf{Dataset} & $\\tilde{\\lambda}$ & $\\sigma$ \\\\
+    \hline
+		Plague & ''',np.round(mle_list[0]['zip'][0], 2),tuple(np.round(ci_list[0]['zip'][0], 2)),''' & ''',np.round(mle_list[0]['zip'][1], 2),tuple(np.round(ci_list[0]['zip'][1], 2)),'''\\\\
+        Mpox & ''',np.round(mle_list[1]['zip'][0], 2),tuple(np.round(ci_list[1]['zip'][0], 2)),''' & ''',np.round(mle_list[1]['zip'][1], 2),tuple(np.round(ci_list[1]['zip'][1], 2)),'''\\\\
+        Ebola, Nigeria 2014 & ''',np.round(mle_list[2]['zip'][0], 2),tuple(np.round(ci_list[2]['zip'][0], 2)),''' & ''',np.round(mle_list[2]['zip'][1], 2),tuple(np.round(ci_list[2]['zip'][1], 2)),'''\\\\
+        Ebola, Guinea 2014 & ''',np.round(mle_list[3]['zip'][0], 2),tuple(np.round(ci_list[3]['zip'][0], 2)),''' & ''',np.round(mle_list[3]['zip'][1], 2),tuple(np.round(ci_list[3]['zip'][1], 2)),'''\\\\
+        SARS, Singapore 2003 & ''',np.round(mle_list[4]['zip'][0], 2),tuple(np.round(ci_list[4]['zip'][0], 2)),''' & ''',np.round(mle_list[4]['zip'][1], 2),tuple(np.round(ci_list[4]['zip'][1], 2)),'''\\\\
+        MERS, South Korea 2015 & ''',np.round(mle_list[5]['zip'][0], 2),tuple(np.round(ci_list[5]['zip'][0], 2)),''' & ''',np.round(mle_list[5]['zip'][1], 2),tuple(np.round(ci_list[5]['zip'][1], 2)),'''\\\\
+        MERS, Saudi Arabia 2015 & ''',np.round(mle_list[6]['zip'][0], 2),tuple(np.round(ci_list[6]['zip'][0], 2)),''' & ''',np.round(mle_list[6]['zip'][1], 2),tuple(np.round(ci_list[6]['zip'][1], 2)),'''\\\\
+        Norovirus, Netherlands 2012 & ''',np.round(mle_list[7]['zip'][0], 2),tuple(np.round(ci_list[7]['zip'][0], 2)),''' & ''',np.round(mle_list[7]['zip'][1], 2),tuple(np.round(ci_list[7]['zip'][1], 2)),'''\\\\
+    \hline
+	\end{tabular}
+	\caption{Maximum likelihood estimates of zero-inflated Poisson model parameters by dataset, 95\\% confidence intervals in parentheses.}
 \end{table}
 ''')
 
