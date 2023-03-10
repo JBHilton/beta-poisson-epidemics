@@ -7,18 +7,18 @@ from random import choices
 from copy import deepcopy
 from multiprocessing import Pool
 from time import time as get_time
-from datasets import (plague_data, monkeypox_data, fasina_ebola_data,
-    fay_ebola_data, cdc_sars_data, cowling_mers_data, mers_data, noro_data)
+from datasets import (plague_data, mpox_data, nigeria_ebola_data,
+    guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import (beta_poisson_loglh, neg_bin_loglh)
 
 data_dict = {
     'plague_data' : plague_data,
-    'monkeypox_data' : monkeypox_data,
-    'fasina_ebola_data' : fasina_ebola_data,
-    'fay_ebola_data' : fay_ebola_data,
-    'cdc_sars_data' : cdc_sars_data,
-    'cowling_mers_data' : cowling_mers_data,
-    'mers_data' : mers_data,
+    'mpox_data' : mpox_data,
+    'nigeria_ebola_data' : nigeria_ebola_data,
+    'guinea_ebola_data' : guinea_ebola_data,
+    'singapore_sars_data' : singapore_sars_data,
+    'sk_mers_data' : sk_mers_data,
+    'sa_mers_data' : sa_mers_data,
     'noro_data' :noro_data
     }
 
@@ -49,12 +49,14 @@ class LmbdGridCalculator:
         phi_p = p[0]
         nu_p = p[1]
 
-        lmbd_grid_val = beta_poisson_loglh(self.data_set,
-                                           self.lmbd_mle,
-                                           phi_p,
-                                           nu_p)
-
-        return lmbd_grid_val
+        if nu_p <= 1/self.lmbd_mle:
+            lmbd_grid_val = beta_poisson_loglh(self.data_set,
+                                            self.lmbd_mle,
+                                            phi_p,
+                                            nu_p)
+            return lmbd_grid_val
+        else:
+            return 1000
 
 class PhiGridCalculator:
     def __init__(self, data_set, mle_dict):
@@ -80,12 +82,14 @@ class PhiGridCalculator:
         lmbd_p = p[0]
         nu_p = p[1]
 
-        phi_grid_val = beta_poisson_loglh(self.data_set,
+        if nu_p <= 1/lmbd_p:
+            phi_grid_val = beta_poisson_loglh(self.data_set,
                                           lmbd_p,
                                           self.phi_mle,
                                           nu_p)
-
-        return phi_grid_val
+            return phi_grid_val
+        else:
+            return 1000
 
 class NuGridCalculator:
     def __init__(self, data_set, mle_dict):
@@ -111,12 +115,14 @@ class NuGridCalculator:
         lmbd_p = p[0]
         phi_p = p[1]
 
-        nu_grid_val = beta_poisson_loglh(self.data_set,
+        if self.nu_mle <= 1/lmbd_p:
+            nu_grid_val = beta_poisson_loglh(self.data_set,
                                          lmbd_p,
                                          phi_p,
                                          self.nu_mle)
-
-        return nu_grid_val
+            return nu_grid_val
+        else:
+            return 1000
 
 def main(no_of_workers,
          data_name):
@@ -125,10 +131,17 @@ def main(no_of_workers,
     fname = 'outputs/mles/'+data_name+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
-        var_dict,
-        ci_dict,
-        var_ci_dict,
-        llh_dict) = load(f)
+            var_dict,
+            od_dict,
+            superspread_dict,
+            p0_dict,
+            ci_dict,
+            mean_ci_dict,
+            var_ci_dict,
+            od_ci_dict,
+            superspread_ci_dict,
+            p0_ci_dict,
+            llh_dict) = load(f)
 
     data_set = data_dict[data_name]
 
@@ -187,6 +200,8 @@ def main(no_of_workers,
     lmbd_grid = array([r for r in lmbd_results]).reshape(len(nu_vals), len(phi_vals))
     phi_grid = array([r for r in phi_results]).reshape(len(nu_vals), len(lmbd_vals))
     nu_grid = array([r for r in nu_results]).reshape(len(phi_vals), len(lmbd_vals))
+
+    print('Sensitivity analysis took',get_time()-main_start,'seconds.')
 
     fname = 'outputs/sensitivity_analyses/'+data_name+'_results.pkl'
     with open(fname, 'wb') as f:

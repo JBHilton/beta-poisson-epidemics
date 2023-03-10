@@ -8,7 +8,7 @@ from datasets import (plague_data, mpox_data, nigeria_ebola_data,
 
 formats = ['.png', '.svg', '.eps']
 
-data_name_list = [
+data_key_list = [
     'plague_data',
     'mpox_data',
     'nigeria_ebola_data',
@@ -17,6 +17,16 @@ data_name_list = [
     'sk_mers_data',
     'sa_mers_data',
     'noro_data'
+    ]
+data_name_list = [
+    'Plague',
+    'Mpox',
+    'Ebola, Nigeria 2014',
+    'Ebola, Guinea 2014',
+    'SARS, Singapore 2003',
+    'MERS, South Korea 2015',
+    'MERS, Saudi Arabia 2015',
+    'Norovirus, Netherlands 2012'
     ]
 data_set_list = [
     plague_data,
@@ -28,23 +38,46 @@ data_set_list = [
     sa_mers_data,
     noro_data
     ]
+figlabels = ['a)',
+    'b)',
+    'c)',
+    'd)',
+    'e)',
+    'f)',
+    'g)',
+    'h)']
 
 mle_list = []
-for i, data_name in enumerate(data_name_list):
-    fname = 'outputs/mles/'+data_name+'_results.pkl'
-    with open(fname, 'rb') as f:
+ci_list = []
+superspread_list = []
+superspread_ci_list = []
+p0_list = []
+p0_ci_list = []
+od_list = []
+od_ci_list = []
+for i, data_key in enumerate(data_key_list):
+    fname = 'outputs/mles/'+data_key+'_results.pkl'
+    with open(fname,'rb') as f:
         (mle_dict,
             var_dict,
             od_dict,
             superspread_dict,
             p0_dict,
             ci_dict,
+            mean_ci_dict,
             var_ci_dict,
             od_ci_dict,
             superspread_ci_dict,
             p0_ci_dict,
             llh_dict) = load(f)
     mle_list.append(mle_dict)
+    ci_list.append(ci_dict)
+    superspread_list.append(superspread_dict)
+    superspread_ci_list.append(superspread_ci_dict)
+    p0_list.append(p0_dict)
+    p0_ci_list.append(p0_ci_dict)
+    od_list.append(od_dict)
+    od_ci_list.append(od_ci_dict)
 
 lmbd_vals_list = []
 phi_vals_list = []
@@ -55,8 +88,8 @@ nu_curve_list = []
 lmbd_grid_list = []
 phi_grid_list = []
 nu_grid_list = []
-for i, data_name in enumerate(data_name_list):
-    fname = 'outputs/sensitivity_analyses/'+data_name+'_results.pkl'
+for i, data_key in enumerate(data_key_list):
+    fname = 'outputs/sensitivity_analyses/'+data_key+'_results.pkl'
     with open(fname, 'rb') as f:
         (lmbd_vals,
         phi_vals,
