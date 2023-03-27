@@ -1,5 +1,7 @@
 '''This plots the output of our main model fitting analysis.'''
 
+from os import mkdir
+from os.path import isdir
 import matplotlib.pyplot as plt
 import numpy as np
 from pickle import load
@@ -7,6 +9,14 @@ from scipy import stats
 from datasets import (plague_data, mpox_data, nigeria_ebola_data,
     guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
+
+if isdir('outputs/mles') is True:
+    fname_root = 'outputs/mles/'
+else:
+    fname_root = 'reference-outputs/mles/'
+
+if isdir('plots') is False:
+    mkdir('plots')
 
 plt.rcParams.update({'font.size': 16})
 
@@ -60,7 +70,7 @@ p0_ci_list = []
 od_list = []
 od_ci_list = []
 for i, data_key_list in enumerate(data_key_list):
-    fname = 'outputs/mles/'+data_key_list+'_results.pkl'
+    fname = fname_root+data_key_list+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
             var_dict,

@@ -27,6 +27,8 @@ data_dict = {
 
 confidence_level = 95
 
+if isdir('outputs') is False:
+    mkdir('outputs')
 if isdir('outputs/mles') is False:
     mkdir('outputs/mles')
 

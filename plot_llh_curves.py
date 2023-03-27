@@ -1,6 +1,8 @@
 "This script generates plots of the log likelihood curves around the MLEs of the beta-Poisson "
 "parameters for each dataset."
 
+from os import mkdir
+from os.path import isdir
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import arange, array, ceil, floor, isnan, linspace, log10, where
@@ -8,6 +10,14 @@ from pickle import load
 from scipy import stats
 from datasets import (plague_data, mpox_data, nigeria_ebola_data,
     guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
+
+if isdir('outputs/sensitivity_analyses'):
+    fname_root = 'outputs/'
+else:
+    fname_root = 'reference-outputs/'
+
+if isdir('plots') is False:
+    mkdir('plots')
 
 plt.rcParams.update({'font.size': 16})
 
@@ -61,7 +71,7 @@ p0_ci_list = []
 od_list = []
 od_ci_list = []
 for i, data_key in enumerate(data_key_list):
-    fname = 'outputs/mles/'+data_key+'_results.pkl'
+    fname = fname_root+'mles/'+data_key+'_results.pkl'
     with open(fname,'rb') as f:
         (mle_dict,
             var_dict,
@@ -94,7 +104,7 @@ lmbd_grid_list = []
 phi_grid_list = []
 nu_grid_list = []
 for i, data_key in enumerate(data_key_list):
-    fname = 'outputs/sensitivity_analyses/'+data_key+'_results.pkl'
+    fname = fname_root+'sensitivity_analyses/'+data_key+'_results.pkl'
     with open(fname, 'rb') as f:
         (lmbd_vals,
         phi_vals,

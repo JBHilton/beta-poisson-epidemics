@@ -22,6 +22,8 @@ data_dict = {
     'noro_data' :noro_data
     }
 
+if isdir('outputs') is False:
+    mkdir('outputs')
 if isdir('outputs/sensitivity_analyses') is False:
     mkdir('outputs/sensitivity_analyses')
 

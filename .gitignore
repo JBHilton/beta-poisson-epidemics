@@ -1,5 +1,5 @@
 .ipynb_checkpoints
-*.png
-*.pkl
 outputs/*
 plots/*
+.DS_store
+__pycache__/*
