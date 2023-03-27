@@ -1,3 +1,6 @@
+"This script generates plots of the log likelihood curves around the MLEs of the beta-Poisson "
+"parameters for each dataset."
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import arange, array, ceil, floor, isnan, linspace, log10, where

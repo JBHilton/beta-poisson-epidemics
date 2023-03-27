@@ -1,4 +1,4 @@
-'''This prints the MLE.'''
+'''This prints the outputs of our analysis as Latex tables.'''
 
 import matplotlib.pyplot as plt
 import numpy as np

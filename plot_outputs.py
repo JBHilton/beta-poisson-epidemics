@@ -1,4 +1,4 @@
-'''This plots the output of the plague analysis.'''
+'''This plots the output of our main model fitting analysis.'''
 
 import matplotlib.pyplot as plt
 import numpy as np
