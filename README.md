@@ -17,3 +17,5 @@ The functions used in our study are stored in `functions.py`. These include func
 * calculates confidence intervals for a statistic from a set of bootstrap samples.
 
 The script `parallel_confidence_intervals.py` calculates MLEs and confidence intervals of model parameters and statistics for each candidate model for a dataset chosen by the user from those stored in `datasets.py`, with the number of bootstraps used in the confidence interval calculation also chosen by the user. The script `sensitivity_analyses.py` performs a sensitivity analysis for a dataset chosen by the user, with log likelihoods given the dataset calculated over a range of beta-Poisson model parameters. The script `plot_outputs.py` generates the plots presented in our manuscript from the outputs of `parallel_confidence_intervals.py`, while `plot_llh_curves.py` generates the plot presented in our appendix from the outputs of `sensititivity_analysis.py`.
+
+The outputs generated for the study itself and used in our plots are provided in the `reference-outputs` folder. Running the scripts will not overwrite this folder.
