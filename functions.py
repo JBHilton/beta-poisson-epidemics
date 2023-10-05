@@ -137,7 +137,7 @@ def beta_poisson_pmf(x,lmbd,Phi,N):
     return P
 
 hyp1f1_alt=np.frompyfunc(mpmath.hyp1f1,3,1)
-def beta_poisson_loglh(data,lmbd,alpha_1,alpha_2):
+def beta_poisson_loglh(data,nu,alpha_1,alpha_2):
     '''
     Calculate log likelihood of beta-Poisson parameters given data.
 
@@ -155,16 +155,18 @@ def beta_poisson_loglh(data,lmbd,alpha_1,alpha_2):
         llh : float
             log likelihood of parameters given data
     '''
-    if (1/lmbd)*(alpha_1 / (alpha_1 + alpha_2))<1e-4:
-        return neg_bin_loglh(data,lmbd,alpha_1/lmbd)
+    p = alpha_1 / (alpha_1 + alpha_2)
+    if nu<1e-4:
+        return neg_bin_loglh(data, p / nu, nu * (alpha_1 + alpha_2))
     else:
+        N = 1/nu
         llh=0
         for x in data:
-            llh+=x*np.log(lmbd * (1 + alpha_2/alpha_1))-np.real(spsp.loggamma(x+1))+np.real(spsp.loggamma(alpha_1 + alpha_2))+np.real(spsp.loggamma(x+alpha_1))-np.real(spsp.loggamma(x+alpha_1 + alpha_2))-np.real(spsp.loggamma(alpha_1))
+            llh+=x*np.log(1 / nu)-np.real(spsp.loggamma(x+1))+np.real(spsp.loggamma(alpha_1 + alpha_2))+np.real(spsp.loggamma(x+alpha_1))-np.real(spsp.loggamma(x+alpha_1 + alpha_2))-np.real(spsp.loggamma(alpha_1))
             if x + alpha_1 + alpha_2 < 50:
-                llh+=np.log(spsp.hyp1f1(x+alpha_1,x+alpha_1 + alpha_2,-lmbd * (1 + alpha_2/alpha_1)))
+                llh+=np.log(spsp.hyp1f1(x+alpha_1,x+alpha_1 + alpha_2,-(1 / nu)))
             else:
-                llh+=np.log(float(hyp1f1_alt(x+alpha_1,x+alpha_1 + alpha_2,-lmbd * (1 + alpha_2/alpha_1))))
+                llh+=np.log(float(hyp1f1_alt(x+alpha_1,x+alpha_1 + alpha_2,-(1 / nu))))
         return llh
 
 def neg_bin_loglh(data,lmbd,phi):
@@ -190,7 +192,7 @@ def neg_bin_loglh(data,lmbd,phi):
         llh+=np.log(stats.nbinom.pmf(x,lmbd*phi,phi/(phi+1)))
     return llh
 
-def get_beta_par_mles(data,alpha_1_0,alpha_2_0):
+def get_beta_par_mles(data,nu_0, alpha_1_0,alpha_2_0):
     '''
     Calculate maximum likelihood estimates of beta-Poisson parameters Phi and N.
 
@@ -211,15 +213,15 @@ def get_beta_par_mles(data,alpha_1_0,alpha_2_0):
             maximum likelihood estimate of nu
     '''
     def f(params):
-        lmbd=np.mean(data)
-        alpha_1=params[0]
-        alpha_2=params[1]
-        return -beta_poisson_loglh(data,lmbd,alpha_1,alpha_2)
+        nu = params[0]
+        alpha_1=params[1]
+        alpha_2=params[2]
+        return -beta_poisson_loglh(data,nu,alpha_1,alpha_2)
 
-    mle=sp.optimize.minimize(f,[alpha_1_0,alpha_2_0],bounds=(sp.optimize.Bounds(lb=[0, 0], ub=[np.inf, np.inf])))
-    if mle.x[1]<0:
-        mle.x[1]=0
-    return mle.x[0],mle.x[1]
+    mle=sp.optimize.minimize(f,[nu_0, alpha_1_0,alpha_2_0],bounds=(sp.optimize.Bounds(lb=[0, 0, 0], ub=[1, np.inf, np.inf])))
+    if mle.x[0]<0:
+        mle.x[0]=0
+    return mle.x[0],mle.x[1], mle.x[2]
 
 def zip_pmf(x,lmbd,sigma):
     '''
@@ -590,6 +592,7 @@ def get_lambda_and_phi_mles(data,lmbd_0,phi_0,N_emp):
 
 def generate_mle_dict(data,
                       theta_0,
+                      nu_0,
                       alpha_1_0,
                       alpha_2_0,
                       lmbd_0,
@@ -620,7 +623,7 @@ def generate_mle_dict(data,
             each model.
     '''
     theta_mle=get_theta_mle(data, theta_0)
-    alpha_1_mle, alpha_2_mle=get_beta_par_mles(data, alpha_1_0, alpha_2_0)
+    nu_mle, alpha_1_mle, alpha_2_mle=get_beta_par_mles(data, nu_0, alpha_1_0, alpha_2_0)
     lmbd_mle,sigma_mle=get_zip_mles(data, lmbd_0, sigma_0)
 
     mle_dict = {
@@ -628,7 +631,7 @@ def generate_mle_dict(data,
         'geometric' : np.mean(data),
         'negative binomial' : [np.mean(data), theta_mle],
         'zip' : [lmbd_mle, sigma_mle],
-        'beta-Poisson' : [np.mean(data), alpha_1_mle, alpha_2_mle]
+        'beta-Poisson' : [nu_mle, alpha_1_mle, alpha_2_mle]
     }
 
     return mle_dict
@@ -1076,7 +1079,7 @@ def neg_bin_bootstrap(data,no_samples,theta_0):
 
     return lmbd_mle,lmbd_ci,lmbd_samples,theta_mle,theta_ci,theta_samples,var_mle,var_ci,var_samples
 
-def beta_poisson_bootstrap(data,no_samples,alpha_1_0, alpha_2_0):
+def beta_poisson_bootstrap(data,no_samples,nu_0,alpha_1_0, alpha_2_0):
     '''
     Calculate confidence intervals for beta-Poisson parameter MLEs using
     bootstrapping.
@@ -1119,11 +1122,10 @@ def beta_poisson_bootstrap(data,no_samples,alpha_1_0, alpha_2_0):
     '''
 
     sample_size=np.size(data)
-
-    lmbd_mle=np.mean(data)
-    alpha_1_mle, alpha_2_mle=get_beta_par_mles(data,alpha_1_0, alpha_2_0)
-    var_mle=lmbd_mle*(1+alpha_1_mle/(alpha_1_mle + alpha_2_mle + 1))
-    lmbd_samples=np.zeros(no_samples)
+    
+    nu_mle, alpha_1_mle, alpha_2_mle=get_beta_par_mles(data, nu_0, alpha_1_0, alpha_2_0)
+    var_mle=nu_mle * (alpha_1_mle / (alpha_1_mle + alpha_2_mle)) * (1 + alpha_2_mle / ((alpha_1_mle + alpha_2_mle) * (alpha_1_mle + alpha_2_mle +1)))
+    nu_samples=np.zeros(no_samples)
     alpha_1_samples=np.zeros(no_samples)
     alpha_2_samples=np.zeros(no_samples)
     print('Now calculating',no_samples,'bootstrap samples.')
@@ -1131,25 +1133,24 @@ def beta_poisson_bootstrap(data,no_samples,alpha_1_0, alpha_2_0):
 
     for i in range(no_samples):
         data_now=random.choices(data,k=sample_size)
-        lmbd_samples[i]=np.mean(data_now)
-        alpha_1_samples[i],alpha_2_samples[i]=get_beta_par_mles(data_now,alpha_1_0, alpha_2_0)
+        nu_samples[i], alpha_1_samples[i],alpha_2_samples[i]=get_beta_par_mles(data_now, nu_0, alpha_1_0, alpha_2_0)
         if ((i+1)%100)==0:
             print('Sample',i+1,'of',no_samples,'completed.',time.time()-start_time,'seconds elapsed, approximately',(no_samples-i-1)*(time.time()-start_time)/(i+1),'remaining.')
 
     sample_array=np.zeros((no_samples,3))
-    sample_array[:,1]=lmbd_samples # np.histogram does things in a slightly unintuitive order - this makes it come out right
+    sample_array[:,1]=nu_samples # np.histogram does things in a slightly unintuitive order - this makes it come out right
     sample_array[:,0]=alpha_1_samples
     sample_array[:,2]=alpha_2_samples
 
-    lmbd_grid_length=int(100*np.max(lmbd_samples))+1
-    lmbd_max_rdd=0.01*(lmbd_grid_length-1)
+    nu_grid_length=int(100*np.max(nu_samples))+1
+    nu_max_rdd=0.01*(nu_grid_length-1)
     alpha_1_grid_length=int(100*np.max(alpha_1_samples))+1
     alpha_1_max_rdd=0.01*(alpha_1_grid_length-1)
     alpha_2_grid_length=int(100*np.max(alpha_2_samples))+1
     alpha_2_max_rdd=0.01*(alpha_2_grid_length-1)
 
     H,edges=np.histogramdd(sample_array,
-            bins=(np.linspace(0,lmbd_max_rdd,lmbd_grid_length),
+            bins=(np.linspace(0,nu_max_rdd,nu_grid_length),
                   np.linspace(0,alpha_1_max_rdd,alpha_1_grid_length),
                   np.linspace(0,alpha_2_max_rdd,alpha_2_grid_length)))
     H_normed=H/np.sum(H)
@@ -1171,9 +1172,9 @@ def beta_poisson_bootstrap(data,no_samples,alpha_1_0, alpha_2_0):
                 next_marker+=0.1
             print('Surpassed',next_marker-0.1,'at time',time.time()-start_time,'.')
     H_normed=H/np.sum(H)
-    lmbdgrid,alpha_1grid,alpha_2grid=np.meshgrid(edges[0],edges[1],edges[2])
-    lmbd_ci=[np.min(lmbdgrid[np.where(H_normed>=current_max)]),np.max(lmbdgrid[np.where(H_normed>=current_max)])]
+    nugrid,alpha_1grid,alpha_2grid=np.meshgrid(edges[0],edges[1],edges[2])
+    nu_ci=[np.min(nugrid[np.where(H_normed>=current_max)]),np.max(nugrid[np.where(H_normed>=current_max)])]
     alpha_1_ci=[np.min(alpha_1grid[np.where(H_normed>=current_max)]),np.max(alpha_1grid[np.where(H_normed>=current_max)])]
     alpha_2_ci=[np.min(alpha_2grid[np.where(H_normed>=current_max)]),np.max(alpha_2grid[np.where(H_normed>=current_max)])]
 
-    return lmbd_mle,lmbd_ci,lmbd_samples,alpha_1_mle,alpha_1_ci,alpha_1_samples,alpha_2_mle,alpha_2_ci,alpha_2_samples
+    return nu_mle,nu_ci,nu_samples,alpha_1_mle,alpha_1_ci,alpha_1_samples,alpha_2_mle,alpha_2_ci,alpha_2_samples

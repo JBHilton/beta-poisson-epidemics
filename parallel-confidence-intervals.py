@@ -40,6 +40,7 @@ class MLECalculator:
 
         # Define some ansatzes of parameter MLEs
         theta_0 = (sample_var / sample_mean) - 1
+        nu_0 = 1 / (10*sample_mean)
         alpha_1_0 = 1
         alpha_2_0 = 1
         zip_lmbd_0 = sample_mean
@@ -48,6 +49,7 @@ class MLECalculator:
         self.data_set = data_set
         self.mle_dict = generate_mle_dict(data_set,
                             theta_0,
+                            nu_0,
                             alpha_1_0,
                             alpha_2_0,
                             zip_lmbd_0,
@@ -86,12 +88,14 @@ class MLECalculator:
             theta_0 = (sample_var / sample_mean) - 1
         else:
             theta_0 = 1e-1
+        nu_0 = 1 / (10 * sample_mean)
         alpha_1_0 = 1
         alpha_2_0 = 1
         zip_lmbd_0 = sample_mean
         sigma_0 = 0.5
         sample_dict = generate_mle_dict(data_now,
                               theta_0,
+                              nu_0,
                               alpha_1_0,
                               alpha_2_0,
                               zip_lmbd_0,
@@ -169,9 +173,9 @@ def main(no_of_workers,
                                             mle_dict['zip'][1],
                                             confidence_level)
 
-    beta_poi_lmbd_samples = array(
+    beta_poi_nu_samples = array(
                             [d['beta-Poisson'][0] for d in dict_samples])
-    beta_poi_lmbd_ci = ci_from_bootstrap_samples(beta_poi_lmbd_samples,
+    beta_poi_nu_ci = ci_from_bootstrap_samples(beta_poi_nu_samples,
                                                 mle_dict['beta-Poisson'][0],
                                                 confidence_level)
     beta_poi_alpha_1_samples = array(
@@ -190,7 +194,7 @@ def main(no_of_workers,
         'geometric' : geo_ci,
         'negative binomial' : [neg_bin_lmbd_ci, neg_bin_theta_ci],
         'zip' : [zip_lmbd_ci, zip_sigma_ci],
-        'beta-Poisson' : [beta_poi_lmbd_ci,
+        'beta-Poisson' : [beta_poi_nu_ci,
                           beta_poi_alpha_1_ci,
                           beta_poi_alpha_2_ci]
     }
@@ -200,7 +204,7 @@ def main(no_of_workers,
         'geometric' : geo_ci,
         'negative binomial' : neg_bin_lmbd_ci,
         'zip' : zip_mean_ci,
-        'beta-Poisson' : beta_poi_lmbd_ci
+        'beta-Poisson' : beta_poi_nu_ci
     }
 
     poisson_var_samples = array([d['poisson'] for d in var_samples])
