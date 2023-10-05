@@ -40,16 +40,16 @@ class MLECalculator:
 
         # Define some ansatzes of parameter MLEs
         theta_0 = (sample_var / sample_mean) - 1
-        phi_0 = 1
-        N_0 = 10 * sample_mean
+        alpha_1_0 = 1
+        alpha_2_0 = 1
         zip_lmbd_0 = sample_mean
         sigma_0 = 0.5
 
         self.data_set = data_set
         self.mle_dict = generate_mle_dict(data_set,
                             theta_0,
-                            phi_0,
-                            1 / N_0,
+                            alpha_1_0,
+                            alpha_2_0,
                             zip_lmbd_0,
                             sigma_0)
         self.var_dict = generate_var_dict(data_set,
@@ -86,14 +86,14 @@ class MLECalculator:
             theta_0 = (sample_var / sample_mean) - 1
         else:
             theta_0 = 1e-1
-        phi_0 = 1 / theta_0
-        N_0 = 2 * sample_mean
+        alpha_1_0 = 1
+        alpha_2_0 = 1
         zip_lmbd_0 = sample_mean
         sigma_0 = 0.5
         sample_dict = generate_mle_dict(data_now,
                               theta_0,
-                              phi_0,
-                              1 / N_0,
+                              alpha_1_0,
+                              alpha_2_0,
                               zip_lmbd_0,
                               sigma_0)
         sample_vars = generate_var_dict(data_now, sample_dict)
@@ -174,14 +174,14 @@ def main(no_of_workers,
     beta_poi_lmbd_ci = ci_from_bootstrap_samples(beta_poi_lmbd_samples,
                                                 mle_dict['beta-Poisson'][0],
                                                 confidence_level)
-    beta_poi_phi_samples = array(
+    beta_poi_alpha_1_samples = array(
                             [d['beta-Poisson'][1] for d in dict_samples])
-    beta_poi_phi_ci = ci_from_bootstrap_samples(beta_poi_phi_samples,
+    beta_poi_alpha_1_ci = ci_from_bootstrap_samples(beta_poi_alpha_1_samples,
                                                 mle_dict['beta-Poisson'][1],
                                                 confidence_level)
-    beta_poi_nu_samples = array(
+    beta_poi_alpha_2_samples = array(
                             [d['beta-Poisson'][2] for d in dict_samples])
-    beta_poi_nu_ci = ci_from_bootstrap_samples(beta_poi_nu_samples,
+    beta_poi_alpha_2_ci = ci_from_bootstrap_samples(beta_poi_alpha_2_samples,
                                                   mle_dict['beta-Poisson'][2],
                                                   confidence_level)
 
@@ -191,8 +191,8 @@ def main(no_of_workers,
         'negative binomial' : [neg_bin_lmbd_ci, neg_bin_theta_ci],
         'zip' : [zip_lmbd_ci, zip_sigma_ci],
         'beta-Poisson' : [beta_poi_lmbd_ci,
-                          beta_poi_phi_ci,
-                          beta_poi_nu_ci]
+                          beta_poi_alpha_1_ci,
+                          beta_poi_alpha_2_ci]
     }
 
     mean_ci_dict = {
