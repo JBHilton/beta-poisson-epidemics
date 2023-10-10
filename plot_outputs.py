@@ -109,9 +109,18 @@ for idx in range(3):
     bar_errs = np.array([[mle_list[i]['beta-Poisson'][idx] - ci_list[i]['beta-Poisson'][idx][0], 
                           ci_list[i]['beta-Poisson'][idx][1] - mle_list[i]['beta-Poisson'][idx]] for i in range(len(mle_list))])
 
-    axes[idx].bar(data_name_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
+    axes[idx].errorbar(data_name_list,
+                       bar_vals,
+                       yerr=bar_errs.T,
+                       lw=0,
+                       elinewidth=2,
+                       marker='o',
+                       ms=8,
+                       color='steelblue',
+                       capsize=8)
     axes[idx].set_ylabel(label_list[idx], rotation=0, labelpad=20)
     axes[idx].set_xticklabels(data_name_list, rotation=45, ha='right')
+
 
 axes[1].set_yscale('log')
 axes[2].set_yscale('log')
@@ -137,6 +146,7 @@ axes[2].text(-3, 20, 'c)',
         verticalalignment='top',
         fontfamily='serif',
         bbox=dict(facecolor='1', edgecolor='none', pad=3.0))
+
 
 for fmt in formats:
     fig.savefig('plots/'+'bp_mles'+fmt,bbox_inches='tight')
@@ -165,21 +175,21 @@ for i, mle_dict in enumerate(mle_list):
 
 
     PoiLine=stats.poisson.pmf(xVals,mle_dict['poisson'])
-    axes[i].plot(xVals,PoiLine,':s', label='Poisson')
+    axes[i].plot(xVals,PoiLine,':s', label='Poisson', lw=2, ms=12)
     # axes[i].bar(xVals,PoiLine, label='Poisson')
 
     GeomLine=stats.geom.pmf(xVals,1/(mle_dict['geometric']+1),-1)
-    axes[i].plot(xVals,GeomLine,'--v', label='Geometric')
+    axes[i].plot(xVals,GeomLine,'--v', label='Geometric', lw=2, ms=12)
     # axes[i].bar(xVals,GeomLine, label='Geometric')
 
     NegBinLine=stats.nbinom.pmf(xVals,
         mle_dict['negative binomial'][0]/mle_dict['negative binomial'][1],
         1/(mle_dict['negative binomial'][1]+1))
-    axes[i].plot(xVals,NegBinLine,'-.x', label='Negative Binomial')
+    axes[i].plot(xVals,NegBinLine,'-.x', label='Negative Binomial', lw=2, ms=12)
     # axes[i].bar(xVals,NegBinLine, label='Negative Binomial')
 
     ZIPLine=zip_pmf(xVals,mle_dict['zip'][0],mle_dict['zip'][1])
-    axes[i].plot(xVals,ZIPLine,'^',linestyle=(0, (3, 5, 1, 5)), label='ZIP')
+    axes[i].plot(xVals,ZIPLine,'^',linestyle=(0, (3, 5, 1, 5)), label='ZIP', lw=2, ms=12)
     # axes[i].bar(xVals,ZIPLine,linestyle=(0, (3, 5, 1, 5)), label='ZIP')
 
     if mle_dict['beta-Poisson'][2]>1e-4:
@@ -187,7 +197,7 @@ for i, mle_dict in enumerate(mle_list):
             mle_dict['beta-Poisson'][0],
             mle_dict['beta-Poisson'][1],
             1/mle_dict['beta-Poisson'][2])
-        axes[i].plot(xVals,BetaPoiLine,'-o', label='Beta Poisson')
+        axes[i].plot(xVals,BetaPoiLine,'-o', label='Beta Poisson', lw=2, ms=12)
         # axes[i].bar(xVals,BetaPoiLine, label='Beta Poisson')
 
     axes[i].set_xlabel('Secondary cases')
@@ -234,7 +244,15 @@ for i, superspread_dict in enumerate(superspread_list):
                          np.array([[superspread_dict[key] - superspread_ci_dict[key][0],  superspread_ci_dict[key][1] - superspread_dict[key]] for key in key_list[1:]]))
     )
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
+    axes[i].errorbar(label_list,
+                       bar_vals,
+                       yerr=bar_errs.T,
+                       lw=0,
+                       elinewidth=2,
+                       marker='_',
+                       ms=12,
+                       color='steelblue',
+                       capsize=8)
     # axes[i].axis([-0.5, 4.5, 0, .1])
     axes[i].set_ylim([0, 0.18])
     axes[i].set_aspect(7/.18)
@@ -280,7 +298,15 @@ for i, p0_dict in enumerate(p0_list):
                          np.array([[p0_dict[key] - p0_ci_dict[key][0],  p0_ci_dict[key][1] - p0_dict[key]] for key in key_list[1:]]))
     )
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
+    axes[i].errorbar(label_list,
+                       bar_vals,
+                       yerr=bar_errs.T,
+                       lw=0,
+                       elinewidth=2,
+                       marker='_',
+                       ms=12,
+                       color='steelblue',
+                       capsize=8)
     # axes[i].axis([-0.5, 4.5, 0, .1])
     axes[i].set_ylim([0, 1])
     axes[i].set_aspect(7/1)
@@ -326,7 +352,15 @@ for i, od_dict in enumerate(od_list):
 
     y_max = 5 * np.ceil((bar_vals + bar_errs[:, 1]).max()/5)
 
-    axes[i].bar(label_list, bar_vals, yerr=bar_errs.T, color='steelblue', capsize=8)
+    axes[i].errorbar(label_list,
+                       bar_vals,
+                       yerr=bar_errs.T,
+                       lw=0,
+                       elinewidth=2,
+                       marker='_',
+                       ms=12,
+                       color='steelblue',
+                       capsize=8)
     axes[i].set_ylim([0, y_max])
     axes[i].set_aspect(6/y_max)
     axes[i].set_ylabel('Overdispersion')
