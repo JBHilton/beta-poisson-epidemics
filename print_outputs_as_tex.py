@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pickle import load
 from scipy import stats
+from scipy.stats.distributions import chi2
 from datasets import (plague_data, mpox_data, nigeria_ebola_data,
     guinea_ebola_data, singapore_sars_data, sk_mers_data, sa_mers_data, noro_data)
 from functions import beta_poisson_pmf, zip_pmf
@@ -374,6 +375,27 @@ print('''
 	\\hline
 	\end{tabular}
 	\caption{Likelihood ratios of beta-Poisson to negative binomial and ZIP models under each dataset.}
+\end{table}
+''')
+
+print('''
+\\begin{table}[ht]
+	\centering
+	\\begin{tabular}{lcccc}
+		\\hline
+		\\textbf{Dataset} & \\textbf{Poisson} & \\textbf{Geometric} & \\textbf{Neg. bin. } & \\textbf{ZIP} \\\\
+    \hline
+		Plague & ''',np.round(chi2.sf(-2*(llh_list[0]['poisson'][0]-llh_list[0]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[0]['geometric'][0]-llh_list[0]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[0]['negative binomial'][0]-llh_list[0]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[0]['zip'][0]-llh_list[0]['beta-Poisson'][0]), 1), 2),''' \\\\
+		Mpox & ''',np.round(chi2.sf(-2*(llh_list[1]['poisson'][0]-llh_list[1]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[1]['geometric'][0]-llh_list[1]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[1]['negative binomial'][0]-llh_list[1]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[1]['zip'][0]-llh_list[1]['beta-Poisson'][0]), 1), 2),''' \\\\
+		Ebola, Nigeria 2014 & ''',np.round(chi2.sf(-2*(llh_list[2]['poisson'][0]-llh_list[2]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[2]['geometric'][0]-llh_list[2]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[2]['negative binomial'][0]-llh_list[2]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[2]['zip'][0]-llh_list[2]['beta-Poisson'][0]), 1), 2),''' \\\\
+		Ebola, Guinea 2014 & ''',np.round(chi2.sf(-2*(llh_list[3]['poisson'][0]-llh_list[3]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[3]['geometric'][0]-llh_list[3]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[3]['negative binomial'][0]-llh_list[3]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[3]['zip'][0]-llh_list[3]['beta-Poisson'][0]), 1), 2),''' \\\\
+		SARS, Singapore 2003 & ''',np.round(chi2.sf(-2*(llh_list[4]['poisson'][0]-llh_list[4]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[4]['geometric'][0]-llh_list[4]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[4]['negative binomial'][0]-llh_list[4]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[4]['zip'][0]-llh_list[4]['beta-Poisson'][0]), 1), 2),''' \\\\
+		MERS, South Korea 2015 & ''',np.round(chi2.sf(-2*(llh_list[5]['poisson'][0]-llh_list[5]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[5]['geometric'][0]-llh_list[5]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[5]['negative binomial'][0]-llh_list[5]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[5]['zip'][0]-llh_list[5]['beta-Poisson'][0]), 1), 2),''' \\\\
+		MERS, Saudi Arabia 2015 & ''',np.round(chi2.sf(-2*(llh_list[6]['poisson'][0]-llh_list[6]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[6]['geometric'][0]-llh_list[6]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[6]['negative binomial'][0]-llh_list[6]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[6]['zip'][0]-llh_list[6]['beta-Poisson'][0]), 1), 2),''' \\\\
+		Norovirus, Netherlands 2012 & ''',np.round(chi2.sf(-2*(llh_list[7]['poisson'][0]-llh_list[7]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[7]['geometric'][0]-llh_list[7]['beta-Poisson'][0]), 2), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[7]['negative binomial'][0]-llh_list[7]['beta-Poisson'][0]), 1), 2),''' & ''',np.round(chi2.sf(-2*(llh_list[7]['zip'][0]-llh_list[7]['beta-Poisson'][0]), 1), 2),''' \\\\
+	\\hline
+	\end{tabular}
+	\caption{Likelihood ratio test statistics obtained by comparing beta-Poisson to other candidate models under each dataset.}
 \end{table}
 ''')
 
