@@ -86,13 +86,13 @@ for v in unique_offspring_vals:
     for i in range(len(data_set_list)):
         ds = data_set_list[i]
         if v==superspread_list[i]['boundary']:
-        	table_str += (''' & \\textbf{''' + str(ds.count(v)) + '''}''')
-		else:
+            table_str += (''' & \\textbf{''' + str(ds.count(v)) + '''}''')
+        else:
             table_str += (''' & ''' + str(ds.count(v)))
-    table_str += '''\\\\\n'''
+    table_str += '''\\\\n'''
 table_str += (''' \\hline Total''')
 for ds in data_set_list:
-        table_str += (''' & ''' + str(sum(ds)))
+        table_str += (''' & ''' + str(len(ds)))
 table_str += '''\\\\\n'''
 table_str += '''
     \\hline
