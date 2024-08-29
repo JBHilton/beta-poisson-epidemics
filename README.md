@@ -1,4 +1,4 @@
-# beta-poisson-epidemic
+# beta-poisson-epidemics
 The code in this repository accompanies the following paper:
 * Hilton J, Hall I (2024) &quot; A beta-Poisson model for infectious disease transmission.&quot; PLOS Computational Biology 20(2): e1011856. https://doi.org/10.1371/journal.pcbi.1011856
 
