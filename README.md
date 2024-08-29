@@ -1,5 +1,6 @@
 # beta-poisson-epidemic
-The code in this repository accompanies the medRXiv preprint *A beta-Poisson model for infectious disease transmission* by Joe Hilton and Ian Hall which introduces a beta-Poisson mixture model for secondary case count data in the early stages of an infectious disease outbreak. The preprint is available here: https://www.medrxiv.org/content/10.1101/2023.03.24.23287701v1
+The code in this repository accompanies the following paper:
+* Hilton J, Hall I (2024) &quot; A beta-Poisson model for infectious disease transmission.&quot; PLOS Computational Biology 20(2): e1011856. https://doi.org/10.1371/journal.pcbi.1011856
 
 The secondary case datasets used in our study are stored in `datasets.py`.
 
